@@ -355,3 +355,5 @@ button:disabled, input:disabled { cursor: not-allowed; }
 @keyframes voicePulse { 50% { box-shadow: 0 0 0 16px rgba(229,72,77,.12), 0 0 50px rgba(229,72,77,.6); } }
 @media (prefers-reduced-motion: reduce) { #voice-btn.recording { animation: none; } }
 #mic-btn.recording { color: #fff; background: var(--rec); border-color: transparent; }
+#handsfree-btn { font-size: 14px; padding: 6px 14px; border-color: var(--gold); color: var(--gold); }
+#handsfree-btn.on { background: var(--gold); color: #1a1410; }
