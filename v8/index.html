@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HUM — סטודיו מוזיקה</title>
+<meta name="description" content="מזמזמים מנגינה ומקבלים שיר עם להקה">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="app.css?v=062662fbab">
+</head>
+<body>
+
+  <!-- Layout follows the approved HUM reference (design/תיאור-תמונת-הרפרנס.md).
+       Controls that are not implemented yet are disabled and say which stage
+       delivers them — no fake functionality (spec E, 57.1). -->
+  <div class="app">
+
+    <!-- ===== Top bar ===== -->
+    <header class="topbar">
+      <div class="topbar-start">
+        <button class="icon-btn" id="menu-btn" aria-label="הצג או הסתר את סרגל הפרויקטים" aria-expanded="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <nav class="mainnav" aria-label="ניווט ראשי">
+          <button class="nav-item active" aria-current="page">
+            <svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg><span>בית</span>
+          </button>
+          <button class="nav-item" disabled data-stage="1">
+            <svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h14"/></svg><span>ספרייה</span>
+          </button>
+          <button class="nav-item" disabled data-stage="4">
+            <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11v2h6v-2a6 6 0 0 0-3-11z"/></svg><span>השראה</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="brand" aria-label="HUM Music Studio">
+        <svg class="brand-wave" viewBox="0 0 80 40" aria-hidden="true"><g id="wl"></g></svg>
+        <div class="brand-text"><span class="brand-hum">HUM</span><span class="brand-sub">MUSIC STUDIO</span></div>
+        <svg class="brand-wave flip" viewBox="0 0 80 40" aria-hidden="true"><g id="wr"></g></svg>
+      </div>
+
+      <div class="topbar-end">
+        <div class="style-wrap">
+        <button class="style-select" id="style-btn" data-live aria-haspopup="menu" aria-expanded="false" title="בחר סגנון — העיבוד ייכתב מחדש בסגנון הזה (המנגינה שלך לא משתנה)">
+          <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3zm11-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3z"/></svg>
+          <span id="style-name">בחר סגנון</span>
+          <svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="style-menu" id="style-menu" role="menu" hidden>
+          <li><button role="menuitem" data-style="pop">פופ</button></li>
+          <li><button role="menuitem" data-style="rock">רוק</button></li>
+          <li><button role="menuitem" data-style="mediterranean">ים תיכוני</button></li>
+          <li><button role="menuitem" data-style="acoustic">אקוסטי</button></li>
+          <li><button role="menuitem" data-style="ballad">בלדה</button></li>
+        </ul>
+        </div>
+        <button class="icon-btn" disabled data-stage="1" aria-label="עזרה">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5h.01"/></svg>
+        </button>
+        <button class="icon-btn" id="settings-btn" aria-label="הגדרות שמע" aria-haspopup="dialog" aria-expanded="false">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+        </button>
+        <div class="profile" title="פרופיל יגיע בשלב 8">
+          <span dir="rtl">שלום</span>
+          <span class="avatar" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Projects (left in the reference) ===== -->
+    <aside class="panel projects" aria-label="הפרויקטים שלי">
+      <div class="panel-head">
+        <h2><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4"/></svg>הפרויקטים שלי</h2>
+        
+      </div>
+      <button class="new-proj-btn" id="new-project" data-live aria-label="פרויקט חדש"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>פרויקט חדש</span></button>
+      <ul class="project-list" id="project-list" aria-label="רשימת פרויקטים"></ul>
+      <div class="empty-state" id="projects-empty">
+        <p>עדיין אין פרויקטים.</p>
+        <p class="muted">לחץ על + כדי ליצור את הפרויקט הראשון.</p>
+      </div>
+      <nav class="side-links" aria-label="קבצים">
+        <button id="versions-btn" data-live><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span>גרסאות</span></button>
+        <button id="files-btn" data-live><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>קבצים ששמרתי</span></button>
+        <button id="duplicate-btn" data-live><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span>שכפל פרויקט</span></button>
+        <button id="audio-export-btn" data-live title="מייצא את כל השיר לקובץ שמע (WAV) שאפשר לשמוע בכל נגן ולשלוח"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>מיקס והורדה</span></button>
+        <button id="settings-link"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span>הגדרות</span></button>
+      </nav>
+      <div class="storage">
+        <div class="storage-label">אחסון פרויקטים</div>
+        <div class="bar"><div class="bar-fill" style="width:0%"></div></div>
+        <div class="muted small">יימדד בפועל משלב 1</div>
+      </div>
+      <div class="build-tag">גרסת פיתוח 0.2 · שלב 1</div>
+    </aside>
+
+    <!-- ===== Center creation area ===== -->
+    <main class="center">
+      <section class="hero" aria-label="יצירה">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <h1 id="proj-title">מה ניצור היום?</h1>
+        <p class="hero-sub" id="proj-sub">לחץ, דבר איתי או זמזם מנגינה — ואני אבנה לך שיר עם להקה</p>
+        <div class="hero-row">
+          <div class="wave-side" aria-hidden="true"><canvas id="wave-r" width="240" height="70"></canvas></div>
+          <div class="mic-wrap">
+            <button class="mic" id="voice-btn" data-live aria-label="לחץ ודבר איתי" aria-pressed="false">
+              <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            </button>
+            <div class="voice-hint" id="voice-hint" aria-live="polite">לחץ ודבר איתי</div>
+            <button class="monitor-btn handsfree" id="handsfree-btn" data-live aria-pressed="false" title="המערכת מקשיבה כל הזמן. אומרים: וייב מיוזיק, תחילת בקשה … וייב מיוזיק, סיום בקשה"><svg viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 8v8M19 11v2"/></svg><span id="handsfree-label">מצב ידיים חופשיות</span></button>
+            <div class="timer" id="rec-timer" dir="ltr">0:00</div>
+            <div class="rec-source" id="rec-source"></div>
+          </div>
+          <div class="wave-side" aria-hidden="true"><canvas id="wave-l" width="240" height="70"></canvas></div>
+        </div>
+        <div class="quick" role="group" aria-label="פעולות מהירות">
+          <button class="q-btn" id="lyrics-btn" disabled data-stage="6"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg><span>מילים</span></button>
+          <button class="q-btn" id="sing-btn" data-live title="הקלטת שירה לערוץ השירה"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>שיר</span></button>
+          <button class="q-btn q-rec" id="mic-btn" data-live aria-pressed="false" title="הקלטה ישירה לערוץ המנגינה"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>הקלטה</span></button>
+          <button class="q-btn" id="monitor-btn" data-live aria-pressed="false" title="לשמוע את עצמך באוזניות בזמן ההקלטה"><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H5a1 1 0 0 1-1-1zM20 15h-3v5h2a1 1 0 0 0 1-1z"/></svg><span>האזן</span></button>
+          <button class="q-btn" id="quick-play" data-live title="נגן את השיר מההתחלה"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>נגן</span></button>
+        </div>
+<details class="more" id="more-tools"><summary>עוד פעולות</summary>
+        <div class="chips" aria-label="פעולות על השיר">
+        <button class="chip" id="chip-guitar" data-live title="מוסיף לעיבוד חלק גיטרה (שאר הכלים לא משתנים)"><svg viewBox="0 0 24 24"><path d="M14 4l6 6-9 9H5v-6z"/></svg>הוסף גיטרה</button>
+        <button class="chip" id="chip-med" data-live title="עיבוד בסגנון ים תיכוני: דרבוקה במקצב מקסום, בס מסונכרן, גיטרה בפריטה"><svg viewBox="0 0 24 24"><path d="M6 5h12l-2 15H8z"/></svg>מקצב ים תיכוני</button>
+        <button class="chip" id="chip-acoustic" data-live title="עיבוד אקוסטי: פריטת גיטרה, שייקר, פסנתר רך"><svg viewBox="0 0 24 24"><circle cx="9" cy="15" r="5"/><circle cx="9" cy="15" r="1.5"/><path d="M12.5 11.5L20 4M18 2l4 4"/></svg>עיבוד אקוסטי</button>
+        <button class="chip gold-chip" id="chip-notes" data-live title="הופך את ההקלטה האחרונה לתווים שמנוגנים בכלי. ההקלטה עצמה לא משתנה"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>הפוך זמזום לתווים</button>
+        <button class="chip" id="chip-quantize" data-live title="מיישר את התווים לרבעי פעמה של הקצב (אפשר לבטל)"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16M8 4v16M16 4v16"/></svg>יישר לקצב</button>
+        <button class="chip" id="chip-tempo" data-live><svg viewBox="0 0 24 24"><path d="M12 3l7 18H5zM12 8v6"/></svg>שנה קצב</button>
+      </div>
+        <div class="hero-tools" aria-label="כלים נוספים">
+          <button class="monitor-btn" id="rerecord-btn" data-live title="מוציא את ההקלטה האחרונה מהשיר (הקובץ נשמר, אפשר לבטל) ומקליט שוב"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span>הקלט מחדש</span></button>
+          <button class="monitor-btn" id="demo-btn" data-live title="מנגן את השיר מההתחלה"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>האזן לדמו</span></button>
+          <label class="monitor-btn" id="upload-btn" title="העלאת הקלטת זמזום מהטלפון או מהמחשב (m4a, mp3, wav)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>העלה הקלטה</span><input type="file" id="upload-input" accept="audio/*" hidden /></label>
+          <label class="monitor-btn" id="midi-btn" title="ייבוא קובץ תווים (MIDI) שיש לך זכות להשתמש בו — הופך לערוצים שאפשר לערוך ולעבד"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>ייבוא קובץ תווים</span><input type="file" id="midi-input" accept=".mid,.midi,audio/midi,audio/x-midi" hidden /></label>
+          <button class="monitor-btn" id="vocal-btn" data-live aria-pressed="false" title="שיר כחצי דקה ואמדוד את טווח הקול שלך. ההקלטה לא נכנסת לשיר"><svg viewBox="0 0 24 24"><path d="M4 12h2M8 8v8M12 5v14M16 9v6M20 11v2"/></svg><span>בדיקת קול</span></button>
+          <label class="monitor-btn" id="vocal-file-btn" title="בדיקת קול מהקלטה שלך שר (מהטלפון או מהמחשב)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>בדיקת קול מקובץ</span><input type="file" id="vocal-file-input" accept="audio/*" hidden /></label>
+          <button class="monitor-btn" id="fit-key-btn" data-live title="מזיז את השיר לסולם שנוח לקול שלך — אחרי אישור" hidden><svg viewBox="0 0 24 24"><path d="M7 17V7l-3 3M17 7v10l3-3"/></svg><span>סולם שנוח לי</span></button>
+        </div>
+        </details>
+      </section>
+
+      <div class="chat-wrap">
+      <form class="chat" id="chat-form" aria-label="תיבת השיחה">
+        <svg class="sparkle" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="11" rx="2"/><path d="M7 11h.01M11 11h.01M15 11h.01M8 15h8"/></svg>
+        <input type="text" id="chat-input" placeholder="אפשר גם לכתוב כאן…" data-live aria-label="הוראה בשפה חופשית" autocomplete="off" />
+        <button class="send" id="send-btn" type="submit" data-live aria-label="שליחה">
+          <svg viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></svg>
+        </button>
+      </form>
+        <div class="reply" id="reply" role="status" aria-live="polite" hidden>
+          <p id="reply-text"></p>
+          <div class="reply-actions" id="reply-actions" hidden>
+            <button class="pill-btn gold" id="confirm-yes"><span>כן, בצע</span></button>
+            <button class="pill-btn" id="confirm-no"><span>לא</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes" id="notes" role="status" hidden></div>
+      <div class="fx-panel" id="fx-panel" role="dialog" aria-labelledby="fx-title" hidden>
+        <div class="fx-head"><strong id="fx-title">אפקטים</strong><button class="icon-btn small" id="fx-close" aria-label="סגור">✕</button></div>
+        <div id="fx-rows"></div>
+        <button class="small-btn" id="fx-reset">בלי אפקטים</button>
+      </div>
+    </main>
+
+    <!-- ===== Production area ===== -->
+      <section class="studio" id="studio" aria-label="אזור ההפקה">
+        <div class="transport">
+          <div class="t-buttons">
+            <button class="t-btn" id="t-rewind" data-live aria-label="חזרה להתחלה"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5L9 12l10 7z"/></svg></button>
+            <button class="t-btn play" id="t-play" data-live aria-label="נגן"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+            <button class="t-btn" id="t-stop" data-live aria-label="עצור"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+            <button class="t-btn rec" id="t-rec" data-live aria-label="הקלט" aria-pressed="false"><span></span></button>
+          </div>
+          <div class="field"><div class="field-val" id="bpm-val">120</div><div class="field-lbl">BPM</div><div class="steppers"><button id="bpm-up" data-live aria-label="הגבר קצב">+</button><button id="bpm-down" data-live aria-label="הנמך קצב">−</button></div></div>
+          <div class="field"><div class="field-val" id="key-val" dir="ltr">A Minor</div><div class="field-lbl">סולם</div><div class="steppers"><button id="key-up" data-live aria-label="סולם חצי טון למעלה">+</button><button id="key-down" data-live aria-label="סולם חצי טון למטה">−</button></div></div>
+          <div class="history"><button class="icon-btn" id="undo-btn" data-live aria-label="ביטול (Ctrl+Z)" title="ביטול (Ctrl+Z)"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button><button class="icon-btn" id="redo-btn" data-live aria-label="ביצוע שוב (Ctrl+Y)" title="ביצוע שוב (Ctrl+Y)"><svg viewBox="0 0 24 24"><path d="M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3"/></svg></button></div>
+          <div class="position" id="pos" dir="ltr" aria-live="off">1.1 · 0:00.0</div>
+          <div class="master-meter" id="master-meter" title="עוצמה כללית" aria-hidden="true"><i></i></div>
+          <div class="t-spacer"></div>
+          <button class="pill-btn" id="rearrange-btn" data-live title="אקורדים אחרים ועיבוד חדש — המנגינה שלך נשארת"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14 5M4 12a8 8 0 0 1 14-5M18 3v4h-4M6 21v-4h4"/></svg><span>עיבוד מחדש</span></button>
+          <button class="pill-btn gold" disabled data-stage="7"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-4M12 4v2M4 12h2M18 12h2"/></svg><span>מאסטרינג</span></button>
+        </div>
+        <div class="timeline">
+          <div class="ruler" dir="ltr"><span>0:00</span><span>0:15</span><span>0:30</span><span>0:45</span><span>1:00</span><span>1:15</span><span>1:30</span></div>
+          <div class="chord-lane" id="chord-lane" dir="ltr" aria-label="אקורדים וחלקי השיר" hidden></div>
+          <div class="tracks" id="tracks"><div class="playhead" id="playhead" hidden></div></div>
+          <div class="tracks-empty" id="tracks-empty">
+            <p id="tracks-empty-title">צור פרויקט כדי להתחיל.</p>
+            <p class="muted">אפשר להוסיף ערוצים מכלי הנגינה שמימין. הנגינה בהם תיווצר מההקלטה שלך בשלבים 3–4.</p>
+          </div>
+        </div>
+      </section>
+    <!-- ===== Mixer console ===== -->
+    <section class="mixer" id="mixer" aria-label="מיקסר">
+      <div class="mx-head">
+        <div class="mx-tabs" role="tablist" aria-label="תצוגת המיקסר">
+          <button role="tab" class="mx-tab active" data-tab="mix" aria-selected="true">מיקסר</button>
+          <button role="tab" class="mx-tab" data-tab="fx" aria-selected="false">אפקטים</button>
+          <button role="tab" class="mx-tab" data-tab="eq" aria-selected="false">EQ</button>
+          <button role="tab" class="mx-tab" data-tab="comp" aria-selected="false">קומפרסור</button>
+          <button role="tab" class="mx-tab" data-tab="master" aria-selected="false">מאסטר</button>
+        </div>
+        <button class="icon-btn small" id="mx-toggle" aria-expanded="true" aria-controls="mx-strips" title="הסתר או הצג את המיקסר"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+      <div class="mx-strips" id="mx-strips"></div>
+    </section>
+
+    <!-- ===== Instruments (right in the reference) ===== -->
+    <aside class="panel instruments" aria-label="כלי נגינה">
+      <div class="panel-head">
+        <h2>כלי נגינה</h2>
+      </div>
+      <label class="inst-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></svg><input id="inst-search" type="search" placeholder="חיפוש כלי נגינה…" aria-label="חיפוש כלי נגינה"></label>
+      <div class="filters" role="group" aria-label="סוג כלי">
+        <button class="filter active" data-cat="all" aria-pressed="true">הכל</button>
+        <button class="filter" data-cat="drums" aria-pressed="false">תופים</button>
+        <button class="filter" data-cat="bass" aria-pressed="false">בס</button>
+        <button class="filter" data-cat="guitars" aria-pressed="false">גיטרות</button>
+        <button class="filter" data-cat="keys" aria-pressed="false">קלידים</button>
+        <button class="filter" data-cat="winds" aria-pressed="false">נשיפה</button>
+        <button class="filter" data-cat="strings" aria-pressed="false">מיתרים</button>
+        <button class="filter" data-cat="other" aria-pressed="false">אחר</button>
+      </div>
+      <ul class="inst-list" id="inst-list"></ul>
+      <p class="credits" id="credits" hidden></p>
+    </aside>
+  </div>
+
+  <!-- ===== MIDI import: where the file came from (stage 5b, spec §19.3) ===== -->
+  <div class="dialog-backdrop" id="rights-dlg" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="rights-title">
+      <h2 id="rights-title">מאיפה קובץ התווים?</h2>
+      <p class="note" id="rights-file" dir="ltr" style="text-align:right"></p>
+      <fieldset class="choice">
+        <legend class="sr-only">מקור הקובץ</legend>
+        <label><input type="radio" name="rights-st" value="own_work"> יצרתי אותו בעצמי</label>
+        <label><input type="radio" name="rights-st" value="licensed"> יש לי רישיון או אישור להשתמש בו</label>
+        <label><input type="radio" name="rights-st" value="public_domain"> זו יצירה בנחלת הכלל (ישנה מאוד, בלי זכויות)</label>
+        <label><input type="radio" name="rights-st" value="unknown"> לא בטוח מאיפה הוא — לתרגול אישי בלבד</label>
+      </fieldset>
+      <label class="field-line">שם השיר (לא חובה)<input id="rights-title-in" maxlength="200" dir="auto"></label>
+      <label class="field-line">מבצע או מלחין (לא חובה)<input id="rights-artist-in" maxlength="200" dir="auto"></label>
+      <label class="field-line" id="rights-license-row" hidden>פרטי הרישיון (לא חובה)<input id="rights-license-in" maxlength="200" dir="auto"></label>
+      <p class="note">התשובה נרשמת בפרויקט. אנחנו לא מורידים שירים מהאינטרנט — רק קבצים שהבאת.</p>
+      <div class="dialog-actions">
+        <button class="pill-btn gold" id="rights-ok" disabled><span>ייבא</span></button>
+        <button class="pill-btn" id="rights-cancel"><span>ביטול</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Audio settings dialog (stage 0: working) ===== -->
+  <div class="dialog-backdrop" id="dlg" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
+      <h2 id="dlg-title">הגדרות שמע</h2>
+      <dl class="kv" id="dev-info">
+        <dt>מצב מנוע השמע</dt><dd id="st-engine">בודק…</dd>
+        <dt>התקן השמעה</dt><dd id="st-device" dir="auto">—</dd>
+        <dt>קצב דגימה</dt><dd id="st-rate" dir="ltr">—</dd>
+        <dt>ערוצים</dt><dd id="st-ch">—</dd>
+      </dl>
+      <p class="note" id="st-note"></p>
+      <div class="dialog-actions">
+        <button class="pill-btn gold" id="tone-btn"><span>השמע צליל בדיקה</span></button>
+        <button class="pill-btn" id="close-btn"><span>סגור</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop" id="pr-dlg" hidden>
+    <div class="dialog pr" role="dialog" aria-modal="true" aria-labelledby="pr-title">
+      <div class="pr-head">
+        <h2 id="pr-title">עריכת תווים</h2>
+        <label class="pr-inst">צליל: <select id="pr-instrument" aria-label="צליל הכלי">
+          <option value="auto">אוטומטי</option><option value="epiano">פסנתר חשמלי</option><option value="soft_lead">סינתיסייזר רך</option><option value="flute">חליל</option><option value="strings">כלי קשת</option><option value="piano">פסנתר</option><option value="guitar">גיטרה</option><option value="bass">בס חשמלי</option><option value="drums">מערכת תופים</option>
+        </select></label>
+      </div>
+      <p class="muted small" id="pr-help">גרור תו כדי להזיז (זמן וגובה) · גרור את הקצה כדי לשנות אורך · לחיצה כפולה על מקום ריק מוסיפה תו · Delete מוחק · תווים בצבע חלש = זוהו בביטחון נמוך</p>
+      <div class="pr-scroll" id="pr-scroll"><canvas id="pr-canvas" tabindex="0" aria-label="רשת התווים"></canvas></div>
+      <div class="dialog-actions pr-actions">
+        <button class="pill-btn" id="pr-down" title="כל התווים חצי טון למטה">חצי טון ↓</button>
+        <button class="pill-btn" id="pr-up" title="כל התווים חצי טון למעלה">חצי טון ↑</button>
+        <button class="pill-btn" id="pr-quant" title="יישור לרבעי פעמה">יישר לקצב</button>
+        <span class="pr-count muted small" id="pr-count"></span>
+        <button class="pill-btn" id="pr-cancel"><span>בטל</span></button>
+        <button class="pill-btn gold" id="pr-save"><span>שמור תווים</span></button>
+      </div>
+    </div>
+  </div>
+  <div class="dialog-backdrop" id="ver-dlg" hidden>
+    <div class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="ver-title">
+      <h2 id="ver-title">גרסאות הפרויקט</h2>
+      <form class="row" id="ver-form">
+        <input type="text" id="ver-name" placeholder="שם לגרסה, למשל: לפני שינוי הבס" maxlength="80" aria-label="שם הגרסה" />
+        <button class="pill-btn gold" type="submit"><span>שמור גרסה</span></button>
+      </form>
+      <p class="muted small">כל 20 שינויים נשמרת גם נקודת שחזור אוטומטית (10 האחרונות נשמרות).</p>
+      <ul class="ver-list" id="ver-list"></ul>
+      <div class="ver-diff" id="ver-diff" hidden>
+        <p id="ver-diff-title"></p>
+        <pre id="ver-diff-text"></pre>
+        <div class="dialog-actions" id="ver-restore-actions" hidden>
+          <button class="pill-btn gold" id="ver-restore-yes"><span>כן, שחזר</span></button>
+          <button class="pill-btn" id="ver-restore-no"><span>לא</span></button>
+        </div>
+      </div>
+      <div class="dialog-actions"><button class="pill-btn" id="ver-close"><span>סגור</span></button></div>
+    </div>
+  </div>
+
+  <div class="dialog-backdrop" id="files-dlg" hidden>
+    <div class="dialog wide" role="dialog" aria-modal="true" aria-labelledby="files-title">
+      <h2 id="files-title">קבצי פרויקט</h2>
+      <p class="muted small" id="files-note">הקבצים נשמרים בתיקייה "HUM" שבתוך "מסמכים". אפשר להעביר אותם למחשב אחר או לשלוח לאחרים.</p>
+      <div class="dialog-actions"><button class="pill-btn gold" id="export-btn"><span>שמור את הפרויקט כקובץ</span></button></div>
+      <ul class="ver-list" id="files-list"></ul>
+      <div class="dialog-actions"><button class="pill-btn" id="files-close"><span>סגור</span></button></div>
+    </div>
+  </div>
+
+  <div class="mode-badge" id="mode-badge" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  
+<script>window.__HUM_SAMPLE_INDEX__ = "instruments/index.json?v=062662fbab";</script>
+<script src="app.js?v=062662fbab"></script>
+</body>
+</html>
