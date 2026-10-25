@@ -357,3 +357,23 @@ button:disabled, input:disabled { cursor: not-allowed; }
 #mic-btn.recording { color: #fff; background: var(--rec); border-color: transparent; }
 #handsfree-btn { font-size: 14px; padding: 6px 14px; border-color: var(--gold); color: var(--gold); }
 #handsfree-btn.on { background: var(--gold); color: #1a1410; }
+/* projects: rename / delete */
+.pi-row { position: relative; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.pi-row .project-item { flex: 1; min-width: 0; }
+.pi-tools { display: flex; gap: 2px; }
+.pi-tool { width: 30px; height: 30px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+.pi-tool:hover, .pi-tool:focus-visible { border-color: var(--line); color: var(--gold); }
+.pi-tool svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.pi-edit { flex: 1; min-width: 0; font: inherit; background: var(--panel, #151d27); color: inherit; border: 1px solid var(--gold); border-radius: 6px; padding: 2px 6px; }
+.pi-confirm { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; padding: 6px; border: 1px solid var(--rec); border-radius: 10px; }
+/* secondary tools: one tidy row under the talk button (keeps the timeline in view) */
+.hero-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 8px; margin-top: 10px; position: relative; z-index: 1; }
+.hero-tools .monitor-btn { white-space: nowrap; }
+.hero-tools .monitor-btn + .monitor-btn { margin-top: 0; }
+.monitor-btn.attention { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 0 3px rgba(226,180,126,.25); }
+#handsfree-btn { white-space: nowrap; }
+.hero-row .wave-side { flex: 1 1 0; min-width: 0; }
+.hero-row .wave-side canvas { width: 100%; max-width: 240px; }
+.hero-row > .pill-btn { flex: none; }
+.pi-sub { white-space: nowrap; }
+@media (max-width: 900px) { .hero-row .mic-wrap { order: -1; flex-basis: 100%; } }

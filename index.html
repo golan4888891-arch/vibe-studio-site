@@ -6,7 +6,7 @@
 <title>HUM — סטודיו מוזיקה</title>
 <meta name="description" content="מזמזמים מנגינה ומקבלים שיר עם להקה">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<link rel="stylesheet" href="app.css?v=6c992e4c14">
+<link rel="stylesheet" href="app.css?v=4ec16b9f9f">
 </head>
 <body>
 
@@ -112,17 +112,19 @@
             <div class="voice-hint" id="voice-hint" aria-live="polite">לחץ ודבר איתי</div>
             <button class="monitor-btn handsfree" id="handsfree-btn" data-live aria-pressed="false" title="המערכת מקשיבה כל הזמן. אומרים: וייב מיוזיק, תחילת בקשה … וייב מיוזיק, סיום בקשה"><svg viewBox="0 0 24 24"><path d="M3 12h2M7 8v8M11 5v14M15 8v8M19 11v2"/></svg><span id="handsfree-label">מצב ידיים חופשיות</span></button>
             <div class="timer" id="rec-timer" dir="ltr">0:00</div>
-            <button class="monitor-btn" id="mic-btn" data-live aria-pressed="false" title="הקלטה ישירה לערוץ המנגינה, בלי שיחה"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg><span>הקלטה ישירה</span></button>
             <div class="rec-source" id="rec-source"></div>
-            <label class="monitor-btn" id="upload-btn" title="העלאת הקלטת זמזום מהטלפון או מהמחשב (m4a, mp3, wav)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>העלה הקלטה</span><input type="file" id="upload-input" accept="audio/*" hidden /></label>
-            <label class="monitor-btn" id="midi-btn" title="ייבוא קובץ תווים (MIDI) שיש לך זכות להשתמש בו — הופך לערוצים שאפשר לערוך ולעבד"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>ייבוא קובץ תווים</span><input type="file" id="midi-input" accept=".mid,.midi,audio/midi,audio/x-midi" hidden /></label>
-            <button class="monitor-btn" id="vocal-btn" data-live aria-pressed="false" title="שיר כחצי דקה ואמדוד את טווח הקול שלך. ההקלטה לא נכנסת לשיר"><svg viewBox="0 0 24 24"><path d="M4 12h2M8 8v8M12 5v14M16 9v6M20 11v2"/></svg><span>בדיקת קול</span></button>
-            <label class="monitor-btn" id="vocal-file-btn" title="בדיקת קול מהקלטה שלך שר (מהטלפון או מהמחשב)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>בדיקת קול מקובץ</span><input type="file" id="vocal-file-input" accept="audio/*" hidden /></label>
-            <button class="monitor-btn" id="fit-key-btn" data-live title="מזיז את השיר לסולם שנוח לקול שלך — אחרי אישור" hidden><svg viewBox="0 0 24 24"><path d="M7 17V7l-3 3M17 7v10l3-3"/></svg><span>סולם שנוח לי</span></button>
-            <button class="monitor-btn" id="monitor-btn" data-live aria-pressed="false" title="לשמוע את עצמך באוזניות בזמן ההקלטה (באוזניות בלבד, כדי למנוע צפצוף)" hidden><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H5a1 1 0 0 1-1-1zM20 15h-3v5h2a1 1 0 0 0 1-1z"/></svg><span>לשמוע את עצמי</span></button>
           </div>
           <div class="wave-side" aria-hidden="true"><canvas id="wave-l" width="240" height="70"></canvas></div>
           <button class="pill-btn" id="demo-btn" data-live title="מנגן את השיר מההתחלה"><span class="play-dot"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span><span>האזן לדמו</span></button>
+        </div>
+        <div class="hero-tools" aria-label="כלים נוספים">
+          <button class="monitor-btn" id="mic-btn" data-live aria-pressed="false" title="הקלטה ישירה לערוץ המנגינה, בלי שיחה"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/></svg><span>הקלטה ישירה</span></button>
+          <label class="monitor-btn" id="upload-btn" title="העלאת הקלטת זמזום מהטלפון או מהמחשב (m4a, mp3, wav)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>העלה הקלטה</span><input type="file" id="upload-input" accept="audio/*" hidden /></label>
+          <label class="monitor-btn" id="midi-btn" title="ייבוא קובץ תווים (MIDI) שיש לך זכות להשתמש בו — הופך לערוצים שאפשר לערוך ולעבד"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg><span>ייבוא קובץ תווים</span><input type="file" id="midi-input" accept=".mid,.midi,audio/midi,audio/x-midi" hidden /></label>
+          <button class="monitor-btn" id="vocal-btn" data-live aria-pressed="false" title="שיר כחצי דקה ואמדוד את טווח הקול שלך. ההקלטה לא נכנסת לשיר"><svg viewBox="0 0 24 24"><path d="M4 12h2M8 8v8M12 5v14M16 9v6M20 11v2"/></svg><span>בדיקת קול</span></button>
+          <label class="monitor-btn" id="vocal-file-btn" title="בדיקת קול מהקלטה שלך שר (מהטלפון או מהמחשב)" hidden><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span>בדיקת קול מקובץ</span><input type="file" id="vocal-file-input" accept="audio/*" hidden /></label>
+          <button class="monitor-btn" id="fit-key-btn" data-live title="מזיז את השיר לסולם שנוח לקול שלך — אחרי אישור" hidden><svg viewBox="0 0 24 24"><path d="M7 17V7l-3 3M17 7v10l3-3"/></svg><span>סולם שנוח לי</span></button>
+          <button class="monitor-btn" id="monitor-btn" data-live aria-pressed="false" title="לשמוע את עצמך באוזניות בזמן ההקלטה (באוזניות בלבד, כדי למנוע צפצוף)" hidden><svg viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3M4 15h3v5H5a1 1 0 0 1-1-1zM20 15h-3v5h2a1 1 0 0 0 1-1z"/></svg><span>לשמוע את עצמי</span></button>
         </div>
       </section>
 
@@ -301,7 +303,7 @@
   <div class="mode-badge" id="mode-badge" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   
-<script>window.__HUM_SAMPLE_INDEX__ = "instruments/index.json?v=6c992e4c14";</script>
-<script src="app.js?v=6c992e4c14"></script>
+<script>window.__HUM_SAMPLE_INDEX__ = "instruments/index.json?v=4ec16b9f9f";</script>
+<script src="app.js?v=4ec16b9f9f"></script>
 </body>
 </html>
