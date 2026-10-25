@@ -435,6 +435,14 @@ button:disabled, input:disabled { cursor: not-allowed; }
 .pi-details[hidden] { display: none; }
 .pi-details dt { color: var(--muted); }
 .pi-details dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+/* quality report in the master tab */
+.mx-qc { margin-top: 6px; font-size: 13px; }
+.mx-qc .qc-title { margin: 0; font-weight: 700; }
+.mx-qc .qc-sum { margin: 2px 0 6px; color: var(--gold); font-weight: 600; }
+.qc-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.qc-rows li { display: flex; gap: 8px; }
+.qc-rows li span { width: 1.2em; text-align: center; font-weight: 700; flex: none; }
+.qc-ok span { color: #3ecf8e; } .qc-warn span { color: #f5a524; } .qc-fail span { color: var(--rec); }
 .pi-menu { position: absolute; inset-inline-start: 8px; top: 100%; z-index: 20; display: flex; flex-direction: column; min-width: 150px; padding: 6px;
   background: #1b2532; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
 .pi-menu[hidden] { display: none; }
