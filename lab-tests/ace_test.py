@@ -2,6 +2,10 @@
 # Three tests: a Hebrew song from words, a band around our hum (cover), the same hum Mediterranean.
 import os, sys, time, urllib.request, traceback
 sys.path.insert(0, "/content/ace")
+if os.environ.get("FORCE_BF16"):
+    # the T4 has no native bfloat16, but bfloat16 keeps float32's range: no overflow to NaN (emulated, slower)
+    import acestep.gpu_config as _g
+    _g.cuda_supports_bfloat16 = lambda *a, **k: True
 from acestep.handler import AceStepHandler
 from acestep.llm_inference import LLMHandler
 from acestep.inference import GenerationParams, GenerationConfig, generate_music
