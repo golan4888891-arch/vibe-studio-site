@@ -11,6 +11,9 @@ from acestep.llm_inference import LLMHandler
 from acestep.inference import GenerationParams, GenerationConfig, generate_music
 os.makedirs("/content/out", exist_ok=True)
 urllib.request.urlretrieve("https://raw.githubusercontent.com/golan4888891-arch/vibe-studio-site/main/lab-tests/hum-ode.wav", "/content/hum.wav")
+import wave
+with wave.open("/content/hum.wav") as w: prm, fr = w.getparams(), w.readframes(w.getnframes())
+with wave.open("/content/hum4.wav", "wb") as w: w.setparams(prm); w.writeframes(fr * 4)  # ~34 s: more material to build on
 t0 = time.time()
 dit = AceStepHandler()
 print("DIT init:", dit.initialize_service(project_root="/content/ace", config_path="acestep-v15-turbo", device="cuda"))
@@ -37,6 +40,9 @@ tests = [
     ("1-hebrew-song", GenerationParams(task_type="text2music", caption="Mediterranean pop ballad, emotional and warm, acoustic guitar, oud, darbuka, strings, piano, deep bass, male lead vocal, polished radio-ready production", lyrics=LYRICS, vocal_language="he", bpm=92, duration=75, shift=3.0)),
     ("2-hum-pop-band", GenerationParams(task_type="cover", src_audio="/content/hum.wav", caption="modern pop band arrangement, drums, bass, electric guitar, piano, polished radio production, keep the melody", audio_cover_strength=0.6, instrumental=True, shift=3.0)),
     ("3-hum-mediterranean", GenerationParams(task_type="cover", src_audio="/content/hum.wav", caption="Mediterranean arrangement, oud, darbuka, qanun, strings, warm bass, keep the melody", audio_cover_strength=0.6, instrumental=True, shift=3.0)),
+    # a weaker grip on the source: keep the tune and form, let the model replace the synthetic tone with real instruments
+    ("4-hum-pop-loose", GenerationParams(task_type="cover", src_audio="/content/hum4.wav", caption="modern pop band, live drums, bass guitar, electric and acoustic guitars, piano, warm polished radio production", audio_cover_strength=0.25, instrumental=True, shift=3.0)),
+    ("5-hum-med-loose", GenerationParams(task_type="cover", src_audio="/content/hum4.wav", caption="Mediterranean pop, oud, darbuka, qanun, strings, warm bass, polished radio production", audio_cover_strength=0.4, instrumental=True, shift=3.0)),
 ]
 ONLY = os.environ.get("ONLY")
 for name, p in tests:
