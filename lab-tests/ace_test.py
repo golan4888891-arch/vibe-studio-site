@@ -46,7 +46,7 @@ tests = [
 ]
 ONLY = os.environ.get("ONLY")
 for name, p in tests:
-    if ONLY and not name.startswith(ONLY): continue
+    if ONLY and name.split("-")[0] not in ONLY.split(","): continue
     t = time.time()
     try:
         r = generate_music(dit, llm, p, cfg, save_dir="/content/out/" + name)
