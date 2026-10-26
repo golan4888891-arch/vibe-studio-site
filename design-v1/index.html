@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HUM – מסך אולפן</title>
+<meta name="robots" content="noindex">
+<style>
+:root{
+  --bg:#0b1017;--bg2:#0f161f;--panel:#141c26;--panel2:#19232f;--panel3:#1f2b39;--line:#263241;--line2:#33424f;
+  --gold:#e2b47e;--gold2:#c99a62;--goldsoft:rgba(226,180,126,.14);
+  --text:#f3eee6;--muted:#9aa5b5;--dim:#6c7787;
+  --rec:#ef4b4f;--recsoft:rgba(239,75,79,.16);--ok:#3fcf8e;--cyc:#e7c45a;
+  --t1:#e0567c;--t2:#3fbf6f;--t3:#8b6cf0;--t4:#3c8ff0;--t5:#e2b14a;--t6:#2fc0c8;--t7:#a0a8b8;
+  --font:"Segoe UI","Heebo","Arial Hebrew","Noto Sans Hebrew",system-ui,sans-serif;
+  --hdr:206px; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ltr{direction:ltr}
+.app{display:grid;height:100vh;grid-template-rows:46px 62px minmax(0,1fr) var(--bottom,300px);
+  grid-template-columns:var(--insp,232px) minmax(0,1fr) var(--lib,280px);
+  grid-template-areas:"top top top" "ctl ctl ctl" "insp main lib" "bot bot bot";gap:6px;padding:0 6px 6px;direction:ltr;
+  background:radial-gradient(1200px 500px at 50% -10%,#18222e 0%,var(--bg) 60%)}
+.app>*{direction:rtl;min-width:0;min-height:0}
+.app.no-insp{--insp:0px}.app.no-insp .insp{display:none}
+.app.no-lib{--lib:0px}.app.no-lib .lib{display:none}
+.app.no-bot{--bottom:34px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px}
+
+/* top bar */
+.top{grid-area:top;display:flex;align-items:center;gap:14px;padding:0 6px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.06em;color:var(--gold);font-size:18px}
+.brand small{display:block;font-size:9px;letter-spacing:.2em;color:var(--muted);font-weight:600}
+.menus{display:flex;gap:2px}
+.menu{position:relative}
+.menu>button{background:none;border:0;padding:6px 10px;border-radius:8px;color:var(--muted)}
+.menu>button:hover,.menu.open>button{background:var(--panel2);color:var(--text)}
+.drop{display:none;position:absolute;top:34px;right:0;min-width:250px;background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:6px;z-index:50;box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.menu.open .drop{display:block}
+.drop button{display:flex;width:100%;justify-content:space-between;gap:18px;background:none;border:0;padding:7px 10px;border-radius:7px;text-align:right}
+.drop button:hover{background:var(--panel3)}
+.drop kbd,.kbd{font-family:inherit;font-size:11px;color:var(--dim);direction:ltr}
+.drop hr{border:0;border-top:1px solid var(--line);margin:5px 4px}
+.proj{margin-inline-start:auto;display:flex;align-items:center;gap:10px}
+.projname{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:6px 12px;font-weight:600}
+.saved{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.saved i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;border:0;background:none;color:var(--muted)}
+.iconbtn:hover{background:var(--panel2);color:var(--text)}
+.ref{font-size:11px;color:var(--gold);border:1px dashed rgba(226,180,126,.45);border-radius:20px;padding:4px 10px}
+
+/* control bar */
+.ctl{grid-area:ctl;display:flex;align-items:center;gap:10px;padding:0 10px;direction:ltr}
+.ctl>*{direction:rtl}
+.transport{display:flex;align-items:center;gap:4px;direction:ltr}
+.tbtn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;color:var(--text)}
+.tbtn:hover{border-color:var(--line2);background:var(--panel3)}
+.tbtn.on{color:var(--gold);border-color:rgba(226,180,126,.5);background:var(--goldsoft)}
+.tbtn.play.on{color:#0b1017;background:var(--gold);border-color:var(--gold)}
+.tbtn.rec{color:var(--rec)}
+.tbtn.rec svg{fill:var(--rec);stroke:none}
+.tbtn.rec.on{background:var(--rec);border-color:var(--rec);color:#fff;animation:pulse 1s infinite}
+.tbtn.rec.on svg{fill:#fff}
+.tbtn.cyc.on{color:#0b1017;background:var(--cyc);border-color:var(--cyc)}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(239,75,79,.25)}}
+.sep{width:1px;height:34px;background:var(--line)}
+.lcd{display:flex;align-items:stretch;gap:0;background:#070b10;border:1px solid var(--line2);border-radius:10px;overflow:hidden;direction:ltr;height:46px}
+.lcd>div{padding:4px 14px;display:flex;flex-direction:column;justify-content:center;border-left:1px solid #18212c;min-width:70px}
+.lcd>div:first-child{border-left:0}
+.lcd b{font-size:19px;font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:.02em;color:#e9f2ff}
+.lcd span{font-size:10px;color:var(--dim);direction:rtl;text-align:center}
+.lcd .pos b{color:var(--gold);min-width:92px;display:inline-block;text-align:center}
+.lcd.recording .pos b{color:var(--rec)}
+.lcd .state{min-width:96px;align-items:center}
+.lcd .state b{font-size:13px;direction:rtl}
+.lcd.recording .state b{color:var(--rec)}
+.lcd input{width:46px;background:none;border:0;color:#e9f2ff;font-size:19px;font-weight:600;text-align:center;padding:0}
+.lcd select{background:none;border:0;color:#e9f2ff;font-size:15px;font-weight:600;padding:0;min-width:0}
+.lcd #lcd-key{width:92px}
+.lcd select option{background:var(--panel2)}
+.views{margin-left:auto;display:flex;gap:4px;direction:rtl}
+.vbtn{height:36px;padding:0 10px;border-radius:9px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.vbtn.on{color:var(--gold);border-color:rgba(226,180,126,.45);background:var(--goldsoft)}
+.vbtn .kbd{margin-inline-start:2px}
+.master-mini{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+.master-mini input{width:90px;accent-color:var(--gold)}
+
+/* inspector */
+.insp{grid-area:insp;display:flex;flex-direction:column;overflow:hidden}
+.ptitle{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid var(--line);font-weight:700}
+.ptitle .muted{font-weight:400;color:var(--muted);font-size:11px}
+.insp-body{padding:10px 12px;display:flex;flex-direction:column;gap:9px;overflow:auto;flex:1}
+.insp-body::-webkit-scrollbar{width:6px}.insp-body::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.trk-id{display:flex;align-items:center;gap:9px}
+.trk-id .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--panel3)}
+.trk-id b{display:block;font-size:14px}
+.trk-id small{color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lbl{color:var(--muted);font-size:11px}
+.sel{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:4px 8px;font-size:12px;max-width:140px}
+.slot{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:5px 8px;font-size:12px;width:100%;text-align:right}
+.slot:hover{border-color:var(--gold2)}
+.slot.empty{color:var(--dim);border-style:dashed}
+.slot i{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none}
+.slot.off i{background:var(--dim)}
+.sect{font-size:11px;color:var(--dim);margin-top:2px}
+.strip-mini{display:flex;gap:10px;align-items:flex-end;justify-content:center;padding-top:4px}
+.vfader{writing-mode:vertical-lr;direction:rtl;height:110px;accent-color:var(--gold)}
+.meter{width:8px;height:110px;border-radius:3px;background:#0a0f15;position:relative;overflow:hidden}
+.meter i{position:absolute;bottom:0;left:0;right:0;height:0;background:linear-gradient(0deg,#2fcf7d 0 65%,#e8c44c 65% 85%,#ef4b4f 85%);transition:height .08s}
+.msri{display:flex;gap:4px}
+.pill{min-width:26px;height:24px;border-radius:6px;border:1px solid var(--line2);background:var(--panel2);font-size:11px;font-weight:700;color:var(--muted);padding:0 5px}
+.pill.m.on{background:#3d8af0;color:#fff;border-color:#3d8af0}
+.pill.s.on{background:#e7c45a;color:#111;border-color:#e7c45a}
+.pill.r.on{background:var(--rec);color:#fff;border-color:var(--rec)}
+.pill.i.on{background:#3fcf8e;color:#0b1017;border-color:#3fcf8e}
+.knob{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#2c3a4a,#151d27);border:1px solid var(--line2);position:relative;cursor:ns-resize;flex:none}
+.knob::after{content:"";position:absolute;left:50%;top:4px;width:2px;height:11px;background:var(--gold);border-radius:2px;transform-origin:50% 13px;transform:translateX(-50%) rotate(var(--a,0deg))}
+.kwrap{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted)}
+
+/* main tracks */
+.main{grid-area:main;display:flex;flex-direction:column;overflow:hidden}
+.tools{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);direction:rtl}
+.toolgrp{display:flex;gap:2px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:2px}
+.tool{width:30px;height:28px;border-radius:7px;border:0;background:none;display:grid;place-items:center;color:var(--muted)}
+.tool.on{background:var(--goldsoft);color:var(--gold)}
+.tool svg{width:16px;height:16px}
+.tools .grow{flex:1}
+.snap{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.addtrack{height:30px;padding:0 12px;border-radius:8px;border:1px solid rgba(226,180,126,.5);background:var(--goldsoft);color:var(--gold);display:flex;align-items:center;gap:6px;font-weight:600}
+.arr{flex:1;display:grid;grid-template-columns:var(--hdr) 1fr;grid-template-rows:auto 1fr;direction:ltr;overflow:hidden;position:relative}
+.corner{border-bottom:1px solid var(--line);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.corner div{height:22px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-size:11px;color:var(--dim);direction:rtl;border-bottom:1px solid #1b2531}
+.corner div:last-child{border-bottom:0;height:26px}
+.rulerwrap{border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.gtrack{height:22px;position:relative;border-bottom:1px solid #1b2531}
+.marker{position:absolute;top:3px;height:16px;border-radius:4px;font-size:10.5px;padding:0 6px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;background:#24303d;color:#cfd8e4;border-left:2px solid var(--gold2)}
+.chord{position:absolute;top:3px;height:16px;font-size:11px;font-weight:700;color:#cbb0ff;padding:0 4px;border-left:1px solid rgba(139,108,240,.6)}
+.ruler{height:26px;position:relative;cursor:pointer;background:linear-gradient(#141c26,#111820)}
+.ruler span{position:absolute;top:0;bottom:0;font-size:10.5px;color:var(--muted);padding:3px 3px;border-left:1px solid #2a3644}
+.ruler span.beat{border-left-color:#1c2631;top:16px}
+.cycle{position:absolute;top:0;height:8px;background:rgba(231,196,90,.85);border-radius:2px;display:none}
+.cycle.on{display:block}
+.punch{position:absolute;top:8px;height:5px;background:rgba(239,75,79,.85);display:none}
+.punch.on{display:block}
+.heads{border-right:1px solid var(--line);overflow:hidden;position:relative}
+.lanes{position:relative;overflow:hidden}
+.th{height:var(--th,52px);display:flex;align-items:center;gap:6px;padding:0 8px 0 6px;border-bottom:1px solid #1b2531;direction:rtl;position:relative;cursor:default}
+.th::before{content:"";position:absolute;right:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:var(--c)}
+.th.pk{background:linear-gradient(270deg,rgba(226,180,126,.10),transparent)}
+.th .tic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 22%,#0f161f);color:var(--c);flex:none}
+.th .tic svg{width:15px;height:15px}
+.th .tname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:12.5px}
+.th .tname small{display:block;font-weight:400;color:var(--dim);font-size:10.5px}
+.th .pill{min-width:22px;height:21px;font-size:10.5px;padding:0 3px}
+.th input[type=range]{width:46px;accent-color:var(--gold)}
+.lane{height:var(--th,52px);border-bottom:1px solid #1b2531;position:relative}
+.lane.pk{background:rgba(255,255,255,.015)}
+.grid{position:absolute;inset:0;pointer-events:none}
+.region{position:absolute;top:4px;bottom:4px;border-radius:6px;background:color-mix(in srgb,var(--c) 30%,#0e141b);border:1px solid color-mix(in srgb,var(--c) 70%,transparent);overflow:hidden;cursor:grab}
+.region.selr{outline:2px solid #fff;outline-offset:-1px}
+.region .rn{position:absolute;top:1px;left:5px;font-size:10px;color:#fff;opacity:.9;white-space:nowrap;direction:rtl;text-shadow:0 1px 2px #000}
+.region svg{position:absolute;left:0;top:12px;width:100%;height:calc(100% - 13px);stroke:none;fill:var(--c);opacity:.95}
+.region.midi svg rect{fill:var(--c)}
+.region.live{background:var(--recsoft);border-color:var(--rec);--c:var(--rec)}
+.region.takes .rn::after{content:" ▾";}
+.fadeh{position:absolute;top:0;width:0;height:0}
+.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);box-shadow:0 0 8px rgba(226,180,126,.7);pointer-events:none;z-index:5}
+.playhead::before{content:"";position:absolute;top:0;left:-5px;border:6px solid transparent;border-top-color:var(--gold)}
+.arr.recording .playhead{background:var(--rec);box-shadow:0 0 8px rgba(239,75,79,.8)}
+.arr.recording .playhead::before{border-top-color:var(--rec)}
+.newtrack-row{height:38px;display:flex;align-items:center;justify-content:center;direction:rtl}
+.newtrack-row button{border:1px dashed var(--line2);background:none;border-radius:8px;padding:5px 12px;color:var(--muted);font-size:12px}
+.newtrack-row button:hover{color:var(--gold);border-color:var(--gold2)}
+.countin{position:absolute;inset:0;display:none;place-items:center;font-size:80px;font-weight:800;color:var(--rec);text-shadow:0 0 30px rgba(239,75,79,.6);pointer-events:none;z-index:20;background:rgba(5,8,12,.35)}
+.countin.on{display:grid}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--panel3);border:1px solid var(--gold2);border-radius:12px;padding:10px 16px;z-index:200;transition:.25s;font-size:13.5px;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* library */
+.lib{grid-area:lib;display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;gap:2px;padding:6px;border-bottom:1px solid var(--line)}
+.tab{flex:1;border:0;background:none;border-radius:8px;padding:6px 4px;color:var(--muted);font-size:12px;white-space:nowrap}
+.tab.on{background:var(--goldsoft);color:var(--gold);font-weight:600}
+.tab:disabled{opacity:.45;cursor:not-allowed}
+.search{margin:8px 10px 4px;display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:6px 9px}
+.search input{flex:1;background:none;border:0;outline:0;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:4px;padding:4px 10px 6px}
+.chip{border:1px solid var(--line);background:var(--panel2);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--muted)}
+.chip.on{background:var(--gold);color:#111;border-color:var(--gold)}
+.items{flex:1;overflow:auto;padding:2px 8px 8px;display:flex;flex-direction:column;gap:4px}
+.items::-webkit-scrollbar{width:6px}.items::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:9px;border:1px solid transparent;background:var(--panel2)}
+.item:hover{border-color:var(--line2)}
+.item .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 22%,#0f161f);color:var(--c);flex:none}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .t small{color:var(--dim);font-size:10.5px}
+.item .lic{font-size:9.5px;color:var(--ok);border:1px solid rgba(63,207,142,.4);border-radius:10px;padding:1px 6px}
+.item .lic.paid{color:var(--gold);border-color:rgba(226,180,126,.5)}
+.item .mini{width:26px;height:26px;border-radius:7px;border:1px solid var(--line2);background:none;display:grid;place-items:center;color:var(--muted)}
+.item .mini svg{width:13px;height:13px}
+.assist-off{margin:10px;padding:12px;border:1px dashed var(--line2);border-radius:10px;color:var(--muted);font-size:12px;line-height:1.6}
+
+/* bottom panel */
+.bot{grid-area:bot;display:flex;flex-direction:column;overflow:hidden}
+.btabs{display:flex;align-items:center;gap:2px;padding:4px 8px;border-bottom:1px solid var(--line)}
+.btab{border:0;background:none;padding:6px 14px;border-radius:8px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.btab.on{background:var(--goldsoft);color:var(--gold);font-weight:600;box-shadow:inset 0 -2px 0 var(--gold)}
+.btabs .ctx{margin-inline-start:auto;color:var(--dim);font-size:11.5px}
+.bpane{flex:1;display:none;overflow:hidden;min-height:0}
+.bpane.on{display:flex}
+.app.no-bot .bpane{display:none!important}
+
+/* mixer */
+.mixer{gap:6px;padding:8px;overflow-x:auto;direction:ltr}
+.strip{width:92px;flex:none;background:var(--panel2);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 5px;direction:rtl;position:relative}
+.strip.pk{border-color:var(--gold2)}
+.strip::after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:3px;border-radius:3px;background:var(--c)}
+.strip .nm{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:84px}
+.strip .ins{width:100%;display:flex;flex-direction:column;gap:2px}
+.strip .ins button{font-size:9.5px;padding:2px 4px;border-radius:4px;border:1px solid var(--line);background:#121922;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.strip .ins button.empty{border-style:dashed;color:var(--dim)}
+.strip .fm{display:flex;gap:6px;align-items:stretch;flex:1;min-height:0;overflow:hidden;position:relative}
+.strip .vfader{height:100%;min-height:0;width:22px}
+.strip .meter{height:auto;align-self:stretch;width:6px}
+.strip .db{font-size:10.5px;color:var(--muted);direction:ltr}
+.strip.master{width:110px;border-color:rgba(226,180,126,.4)}
+.strip.aux{background:#16202b}
+.mixsep{width:1px;background:var(--line);flex:none;margin:0 4px}
+
+/* piano roll */
+.pr{direction:ltr;width:100%;display:grid;grid-template-columns:54px 1fr;grid-template-rows:1fr 58px;min-height:0}
+.keys{overflow:hidden;border-right:1px solid var(--line);position:relative}
+.key{height:14px;border-bottom:1px solid #1d2530;font-size:9px;color:#334;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;background:#e9edf2}
+.key.b{background:#1a1f27;color:#777}
+.prgrid{position:relative;overflow:hidden;cursor:crosshair}
+.note{position:absolute;height:12px;border-radius:3px;background:var(--c);border:1px solid rgba(255,255,255,.35);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.vel{grid-column:2;border-top:1px solid var(--line);position:relative}
+.vel i{position:absolute;bottom:4px;width:4px;background:var(--gold);border-radius:2px}
+.prside{grid-column:1;grid-row:2;font-size:10px;color:var(--dim);display:grid;place-items:center;border-top:1px solid var(--line);border-right:1px solid var(--line)}
+
+/* audio editor */
+.ae{width:100%;display:flex;flex-direction:column;padding:8px 12px;gap:8px;direction:rtl}
+.ae .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ae .wave{flex:1;position:relative;background:#0b1118;border:1px solid var(--line);border-radius:10px;overflow:hidden;direction:ltr}
+.ae .wave svg{position:absolute;inset:0;width:100%;height:100%;stroke:none}
+.btn{height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);font-size:12px}
+.btn:hover{border-color:var(--gold2)}
+.btn.gold{background:var(--gold);color:#111;border-color:var(--gold);font-weight:700}
+
+/* step seq */
+.seq{width:100%;padding:8px 12px;display:flex;flex-direction:column;gap:3px;direction:ltr;overflow:auto}
+.seqrow{display:grid;grid-template-columns:110px repeat(16,1fr);gap:3px;align-items:center}
+.seqrow .nm{direction:rtl;text-align:right;font-size:11.5px;color:var(--muted);padding-right:6px}
+.step{height:20px;border-radius:4px;border:1px solid #273341;background:#121922}
+.step:nth-child(4n+2){background:#161f2a}
+.step.on{background:var(--t4);border-color:#8cbcff}
+.step.cur{box-shadow:0 0 0 2px var(--gold) inset}
+
+/* effects pane */
+.fx{width:100%;display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:10px;padding:8px 10px;min-height:0}
+.chain{display:flex;flex-direction:column;gap:5px;overflow:auto}
+.chain .slot{padding:7px 9px}
+.fxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;overflow:auto;align-content:start}
+.fxcard{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px;text-align:right}
+.fxcard:hover{border-color:var(--gold2)}
+.fxcard b{display:block;font-size:12.5px}
+.fxcard small{color:var(--dim);font-size:10.5px;line-height:1.4;display:block;margin-top:2px}
+.fxcard .tag{font-size:9.5px;color:var(--gold);float:left}
+
+/* master pane */
+.mst{width:100%;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;padding:8px 10px}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.box h4{margin:0;font-size:12.5px}
+.big{font-size:28px;font-weight:700;direction:ltr;text-align:center;color:var(--gold)}
+
+/* dialogs */
+.scrim{position:fixed;inset:0;background:rgba(3,6,10,.62);display:none;place-items:center;z-index:100}
+.scrim.on{display:grid}
+.dlg{width:min(760px,94vw);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.dlg header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.dlg header h3{margin:0;font-size:16px}
+.dlg .body{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.dlg footer{display:flex;gap:8px;justify-content:flex-start;padding:12px 18px;border-top:1px solid var(--line)}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.type{border:1px solid var(--line);background:var(--panel2);border-radius:12px;padding:12px;text-align:right;display:flex;gap:10px;align-items:flex-start}
+.type.on{border-color:var(--gold);background:var(--goldsoft)}
+.type .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--panel3);color:var(--gold);flex:none}
+.type b{display:block}
+.type small{color:var(--muted);font-size:11.5px;line-height:1.45}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11.5px;color:var(--muted)}
+.field select,.field input{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.checks{display:flex;gap:18px;flex-wrap:wrap}
+.checks label{display:flex;gap:6px;align-items:center}
+.checks input{accent-color:var(--gold)}
+.plug{width:min(640px,94vw)}
+.plug .body{gap:12px}
+.eqsvg{width:100%;height:190px;background:#0a0f15;border:1px solid var(--line);border-radius:10px;direction:ltr;display:block}
+.eqsvg .dot{fill:var(--gold);stroke:#111;stroke-width:1.5;cursor:grab}
+.knobs{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.knobs .knob{width:46px;height:46px}
+.knobs .knob::after{height:15px;transform-origin:50% 19px}
+.knobs .kwrap b{color:var(--text);font-size:11px;direction:ltr}
+.grm{height:10px;background:#0a0f15;border-radius:5px;overflow:hidden;direction:ltr}
+.grm i{display:block;height:100%;width:30%;background:linear-gradient(90deg,var(--gold),#e8764c)}
+.helpgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+.helpgrid div{display:flex;justify-content:space-between;border-bottom:1px solid #1d2733;padding:5px 0}
+@media (max-height:820px){.app{--bottom:240px;grid-template-rows:42px 56px minmax(0,1fr) var(--bottom)}.app.no-bot{--bottom:34px}.tbtn{width:36px;height:36px}.lcd{height:42px}.lcd b{font-size:17px}:root{--th:44px}}
+@media (max-height:700px){.app{--bottom:200px}}
+@media (max-width:1380px){.app{--insp:206px;--lib:248px}.vbtn .kbd{display:none}.master-mini{display:none}}
+@media (max-width:1180px){.app{--insp:0px}.insp{display:none}.views .vbtn span.t{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- TOP BAR -->
+  <header class="top card" style="border:0;background:none">
+    <div class="brand">HUM<small>MUSIC STUDIO</small></div>
+    <nav class="menus" id="menus"></nav>
+    <div class="proj">
+      <span class="ref" title="מסך רפרנס לעיצוב">מסך רפרנס · ההתנהגות מודגמת, עדיין לא מחובר למנוע</span>
+      <span class="projname">שיר הפצפוצים</span>
+      <span class="saved"><i></i><span id="savedtxt">נשמר</span></span>
+      <button class="iconbtn" id="undo" title="ביטול פעולה (Ctrl+Z)"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="iconbtn" id="redo" title="ביצוע שוב (Ctrl+Shift+Z)"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+      <button class="iconbtn" id="helpbtn" title="קיצורי מקלדת (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5h.01"/></svg></button>
+      <button class="iconbtn" title="הגדרות: מיקרופון, רמקולים, השהיה"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+    </div>
+  </header>
+
+  <!-- CONTROL BAR -->
+  <section class="ctl card">
+    <div class="transport">
+      <button class="tbtn" id="b-start" title="חזרה להתחלה (Enter)"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 6 9 12l9 6z"/></svg></button>
+      <button class="tbtn" id="b-rew" title="אחורה תיבה (,)"><svg viewBox="0 0 24 24"><path d="M11 6 4 12l7 6z"/><path d="M20 6l-7 6 7 6z"/></svg></button>
+      <button class="tbtn" id="b-ff" title="קדימה תיבה (.)"><svg viewBox="0 0 24 24"><path d="M13 6l7 6-7 6z"/><path d="M4 6l7 6-7 6z"/></svg></button>
+      <button class="tbtn" id="b-stop" title="עצירה (רווח)"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+      <button class="tbtn play" id="b-play" title="ניגון / עצירה (רווח)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="tbtn rec" id="b-rec" title="הקלטה (R) · עצירה ברווח"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/></svg></button>
+      <span class="sep"></span>
+      <button class="tbtn cyc" id="b-cyc" title="לולאה (C) · או גרירה על הסרגל"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+      <button class="tbtn" id="b-punch" title="פאנץ' – הקלטה רק בקטע המסומן (P)"><svg viewBox="0 0 24 24"><path d="M4 12h4"/><path d="M16 12h4"/><rect x="8" y="7" width="8" height="10" rx="2"/></svg></button>
+      <button class="tbtn on" id="b-count" title="ספירה לפני הקלטה (1-2-3-4)"><svg viewBox="0 0 24 24"><path d="M5 20h14"/><path d="M8 20 11 4h2l3 16"/><path d="M12 14l4-6"/></svg></button>
+      <button class="tbtn" id="b-metro" title="מטרונום (K)"><svg viewBox="0 0 24 24"><path d="M9 3h6l3 18H6z"/><path d="M12 15l5-8"/></svg></button>
+    </div>
+    <div class="lcd" id="lcd">
+      <div class="pos"><b id="lcd-bars">1.1.1</b><span>תיבה.פעמה</span></div>
+      <div class="pos"><b id="lcd-time">00:00.0</b><span>זמן</span></div>
+      <div><input id="lcd-bpm" value="96" inputmode="numeric" title="קצב – אפשר להקליד"><span>קצב (BPM)</span></div>
+      <div><select id="lcd-sig"><option>4/4</option><option>3/4</option><option>6/8</option><option>7/8</option></select><span>משקל</span></div>
+      <div><select id="lcd-key"><option>לה מינור</option><option>דו מז'ור</option><option>רה מינור</option><option>מי מינור</option><option>סול מז'ור</option><option>פה מז'ור</option></select><span>סולם</span></div>
+      <div class="state"><b id="lcd-state">עצור</b><span>מצב</span></div>
+    </div>
+    <div class="master-mini"><span>עוצמה ראשית</span><input type="range" min="0" max="100" value="80"></div>
+    <div class="views">
+      <button class="vbtn on" data-view="insp"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="1.5"/><path d="M14 8h7M14 12h7M14 16h5"/></svg><span class="t">מפקח</span><span class="kbd">I</span></button>
+      <button class="vbtn on" data-view="lib"><svg viewBox="0 0 24 24"><path d="M4 5h4v14H4zM10 5h4v14h-4z"/><path d="m16 6 3.5-1 3 13.5-3.5 1z"/></svg><span class="t">ספרייה</span><span class="kbd">Y</span></button>
+      <button class="vbtn on" data-view="bot"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v16"/><rect x="4" y="13" width="4" height="3" rx="1"/><rect x="10" y="7" width="4" height="3" rx="1"/><rect x="16" y="11" width="4" height="3" rx="1"/></svg><span class="t">חלון תחתון</span><span class="kbd">X/E</span></button>
+    </div>
+  </section>
+
+  <!-- INSPECTOR -->
+  <aside class="insp card" id="insp"></aside>
+
+  <!-- TRACKS / ARRANGE -->
+  <main class="main card">
+    <div class="tools">
+      <div class="toolgrp" id="toolgrp"></div>
+      <div class="snap"><span>הצמדה</span>
+        <select class="sel" id="snap"><option>תיבה</option><option>רבע</option><option>שמינית</option><option>שש-עשרית</option><option>ללא</option></select>
+      </div>
+      <div class="snap"><span>גובה</span><input type="range" id="th" min="38" max="80" value="52" style="width:70px;accent-color:var(--gold)"></div>
+      <div class="snap"><span>זום</span><input type="range" id="zoom" min="8" max="64" value="16" style="width:90px;accent-color:var(--gold)"></div>
+      <span class="grow"></span>
+      <button class="addtrack" id="addtrack" title="ערוץ חדש (Ctrl+Alt+N)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>ערוץ חדש</button>
+    </div>
+    <div class="arr" id="arr">
+      <div class="corner"><div>סמנים</div><div>אקורדים</div><div></div></div>
+      <div class="rulerwrap" id="rulerwrap">
+        <div class="gtrack" id="g-mark"></div>
+        <div class="gtrack" id="g-chord"></div>
+        <div class="ruler" id="ruler"><div class="cycle" id="cycle"></div><div class="punch" id="punch"></div></div>
+      </div>
+      <div class="heads" id="heads"></div>
+      <div class="lanes" id="lanes"><div class="playhead" id="ph"></div></div>
+      <div class="countin" id="countin">1</div>
+    </div>
+  </main>
+
+  <!-- LIBRARY -->
+  <aside class="lib card" id="lib">
+    <div class="tabs" id="libtabs">
+      <button class="tab on" data-l="inst">כלי נגינה</button>
+      <button class="tab" data-l="loops">לופים וסאונדים</button>
+      <button class="tab" data-l="fx">אפקטים</button>
+      <button class="tab" data-l="ai" title="יגיע אחרי שהבסיס יושלם">עוזר AI · בהמשך</button>
+    </div>
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="libq" placeholder="חיפוש כלי, צליל או אפקט…"></div>
+    <div class="chips" id="chips"></div>
+    <div class="items" id="items"></div>
+  </aside>
+
+  <!-- BOTTOM PANEL -->
+  <section class="bot card">
+    <div class="btabs" id="btabs">
+      <button class="btab on" data-b="mixer">מיקסר <span class="kbd">X</span></button>
+      <button class="btab" data-b="piano">עורך תווים <span class="kbd">E</span></button>
+      <button class="btab" data-b="audio">עורך שמע</button>
+      <button class="btab" data-b="steps">מכונת תופים</button>
+      <button class="btab" data-b="fx">אפקטים לערוץ</button>
+      <button class="btab" data-b="master">מאסטר וייצוא</button>
+      <span class="ctx" id="bctx"></span>
+    </div>
+    <div class="bpane mixer on" id="p-mixer"></div>
+    <div class="bpane" id="p-piano"></div>
+    <div class="bpane" id="p-audio"></div>
+    <div class="bpane" id="p-steps"></div>
+    <div class="bpane" id="p-fx"></div>
+    <div class="bpane" id="p-master"></div>
+  </section>
+</div>
+
+<!-- NEW TRACK DIALOG -->
+<div class="scrim" id="nt">
+  <div class="dlg" role="dialog" aria-label="ערוץ חדש">
+    <header><h3>ערוץ חדש</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    <div class="body">
+      <div class="types" id="types"></div>
+      <div class="fields">
+        <div class="field"><label>מקור הצליל (כניסה)</label><select id="nt-in"><option>מיקרופון 1 (מונו)</option><option>מיקרופון 2 (מונו)</option><option>כניסה 1+2 (סטריאו)</option></select></div>
+        <div class="field"><label>כלי / צליל</label><select id="nt-inst"></select></div>
+        <div class="field"><label>כמה ערוצים</label><input type="number" id="nt-n" value="1" min="1" max="16"></div>
+        <div class="field"><label>שם</label><input id="nt-name" placeholder="למשל: שירה ראשית"></div>
+        <div class="field"><label>יציאה</label><select><option>יציאה ראשית (סטריאו)</option><option>אוטובוס תופים</option></select></div>
+        <div class="field"><label>צבע</label><select id="nt-color"><option value="var(--t1)">ורוד</option><option value="var(--t2)">ירוק</option><option value="var(--t3)">סגול</option><option value="var(--t4)">כחול</option><option value="var(--t5)">זהב</option><option value="var(--t6)">טורקיז</option></select></div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="nt-arm" checked> מוכן להקלטה (R)</label>
+        <label><input type="checkbox" id="nt-mon"> לשמוע את עצמי בזמן הקלטה (רק עם אוזניות)</label>
+        <label><input type="checkbox" id="nt-lib" checked> לפתוח את ספריית הצלילים</label>
+      </div>
+    </div>
+    <footer><button class="btn gold" id="nt-ok">יצירה</button><button class="btn" data-close>ביטול</button></footer>
+  </div>
+</div>
+
+<!-- PLUGIN WINDOW -->
+<div class="scrim" id="pw">
+  <div class="dlg plug" role="dialog">
+    <header><h3 id="pw-title">אקולייזר</h3>
+      <div style="display:flex;gap:6px;align-items:center"><select class="sel" id="pw-preset"></select><button class="btn" id="pw-bypass">עקיפה</button><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></header>
+    <div class="body" id="pw-body"></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div class="scrim" id="hp">
+  <div class="dlg"><header><h3>קיצורי מקלדת – כמו בכל תוכנת הקלטה</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+  <div class="body"><div class="helpgrid" id="helpgrid"></div></div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const IC={
+ mic:'<path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ guitar:'<path d="M19 3l2 2-4.5 4.5"/><path d="M15 7l2 2"/><path d="M11.5 9.5a4 4 0 0 0-5.3.3c-1.2 1.2-.9 2.4-1.7 3.2S2 14 3 17s4 4 7 4 1.8-2.3 3-3.5 2-.5 3.2-1.7a4 4 0 0 0 .3-5.3"/><circle cx="10" cy="15" r="1.5"/>',
+ bass:'<path d="M20 2l2 2-6 6"/><path d="M13 9l2 2"/><path d="M10 11a4 4 0 0 0-5 1c-1.5 1.5 0 3-1.5 4.5S5 22 9 21s3-3.5 4.5-5 2-3 1-5"/>',
+ drums:'<ellipse cx="12" cy="9" rx="8" ry="3"/><path d="M4 9v6c0 1.7 3.6 3 8 3s8-1.3 8-3V9"/><path d="M6 3l4 5M18 3l-4 5"/>',
+ piano:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M8 5v8M12 5v8M16 5v8M3 13h18"/>',
+ synth:'<rect x="2" y="7" width="20" height="11" rx="2"/><circle cx="7" cy="11" r="1.4"/><circle cx="12" cy="11" r="1.4"/><path d="M5 15h14"/>',
+ strings:'<path d="M14 3c-3 3-4 6-3 9-3 0-5 2-5 4.5S8 21 10 21s4-1.5 4-4c3 1 6 0 9-3"/><path d="M3 21l8-8"/>',
+ fx:'<path d="M4 7h10M4 17h6M18 4v6M15 7h6"/><circle cx="16" cy="17" r="3"/>',
+ folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+ midi:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8" cy="10" r="1"/><circle cx="12" cy="8" r="1"/><circle cx="16" cy="10" r="1"/>',
+ flute:'<path d="M3 17 17 3l4 4L7 21z"/><path d="M8 14l1 1M11 11l1 1M14 8l1 1"/>',
+ brass:'<path d="M3 10h9l6-5v14l-6-5H3z"/><path d="M6 10v4"/>',
+ play:'<path d="M8 5v14l11-7z"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+ ptr:'<path d="M5 3l14 7-6 2-2 6z"/>', pen:'<path d="M4 20l4-1L19 8l-3-3L5 16z"/>', cut:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5 20 20M8.5 15.5 20 4"/>',
+ glue:'<path d="M9 3h6v5l-3 3-3-3z"/><path d="M12 11v10"/>', erase:'<path d="m7 21-4-4 10-10 6 6-8 8z"/><path d="M14 21h7"/>', fade:'<path d="M3 20 21 4"/><path d="M3 20h18"/>', zoomt:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/>', auto:'<path d="M3 17l5-6 4 3 4-7 5 5"/>'
+};
+const ico=(k)=>`<svg viewBox="0 0 24 24">${IC[k]||IC.fx}</svg>`;
+
+// ---------- data ----------
+let BPM=96, BARS=48;
+const S={playing:false,recording:false,pos:0,cycle:{on:false,a:8,b:16},punch:{on:false,a:10,b:12},metro:false,count:true,sel:0,tool:'ptr',zoom:16,takes:0,selRegion:null};
+const T=[
+ {name:'שירה ראשית',sub:'שמע · מיקרופון 1',type:'audio',icon:'mic',c:'var(--t1)',vol:78,pan:0,m:0,s:0,r:1,i:0,inserts:['כוונון קול','אקולייזר','קומפרסור','דה-אסר'],sends:{rev:35,del:18},regions:[{a:9,l:8,n:'שירה · טייק 3',takes:3},{a:25,l:8,n:'שירה · טייק 1'}]},
+ {name:'גיטרה אקוסטית',sub:'שמע · מיקרופון 2',type:'audio',icon:'guitar',c:'var(--t2)',vol:66,pan:-30,m:0,s:0,r:0,i:0,inserts:['אקולייזר','קומפרסור'],sends:{rev:22,del:0},regions:[{a:1,l:16,n:'גיטרה · פריטה'},{a:17,l:16,n:'גיטרה · פזמון'}]},
+ {name:'בס',sub:'כלי וירטואלי · בס אצבעות',type:'midi',icon:'bass',c:'var(--t3)',vol:70,pan:0,m:0,s:0,r:0,i:0,inserts:['קומפרסור','סטורציה'],sends:{rev:0,del:0},regions:[{a:5,l:28,n:'בס'}]},
+ {name:'תופים',sub:'מכונת תופים · ערכת פופ',type:'drums',icon:'drums',c:'var(--t4)',vol:72,pan:0,m:0,s:0,r:0,i:0,inserts:['אקולייזר','קומפרסור'],sends:{rev:12,del:0},regions:[{a:1,l:4,n:'פתיחה'},{a:5,l:12,n:'בית'},{a:17,l:8,n:'פזמון'},{a:25,l:8,n:'בית'}]},
+ {name:'פסנתר',sub:'כלי וירטואלי · פסנתר זקוף',type:'midi',icon:'piano',c:'var(--t5)',vol:62,pan:20,m:0,s:0,r:0,i:0,inserts:['אקולייזר'],sends:{rev:40,del:0},regions:[{a:1,l:8,n:'פסנתר · פתיחה'},{a:17,l:16,n:'פסנתר · אקורדים'}]},
+ {name:'מיתרים',sub:'כלי וירטואלי · אנסמבל',type:'midi',icon:'strings',c:'var(--t6)',vol:52,pan:-10,m:0,s:0,r:0,i:0,inserts:[],sends:{rev:55,del:0},regions:[{a:17,l:16,n:'מיתרים · פזמון'}]},
+];
+const AUX=[{name:'ריוורב (חדר)',c:'var(--t7)',vol:60,inserts:['ריוורב']},{name:'דיליי (הד)',c:'var(--t7)',vol:50,inserts:['דיליי']}];
+const MARKS=[[1,'פתיחה'],[5,'בית 1'],[17,'פזמון'],[25,'בית 2'],[33,'פזמון'],[41,'גשר'],[45,'סיום']];
+const CHORDS=['Am','F','C','G','Am','F','C','E'];
+const FX=[
+ ['אקולייזר','מעצב את הצליל: יותר בס, פחות "בוץ", יותר בהירות','בסיסי','eq'],
+ ['קומפרסור','מאזן בין חלקים חלשים לחזקים, הקול "יושב" במיקס','בסיסי','comp'],
+ ['ריוורב','חלל: חדר, אולם, כנסייה, פלטה','בסיסי','gen'],
+ ['דיליי','הד שחוזר בקצב השיר','בסיסי','gen'],
+ ['כוונון קול','מתקן זיופים לסולם השיר, מעדין או "אוטוטיון"','קול','gen'],
+ ['דה-אסר','מרכך שי"ן וסמ"ך חדים בשירה','קול','gen'],
+ ['גייט','משתיק רעש רקע בין המשפטים','קול','gen'],
+ ['דאבלר','מכפיל את הקול לתחושה רחבה','קול','gen'],
+ ['הרמונייזר','מוסיף קולות ליווי בהרמוניה','קול','gen'],
+ ['סטורציה','חום של טייפ ומנורות','צבע','gen'],
+ ['דיסטורשן','עיוות לגיטרה חשמלית ורוק','גיטרה','gen'],
+ ['מגבר גיטרה','הדמיית מגבר ורמקול','גיטרה','gen'],
+ ['כורוס','צליל רחב ונוצץ','מודולציה','gen'],
+ ['פלנג\'ר','סחרור מטאלי','מודולציה','gen'],
+ ['פייזר','גל רך ומסתובב','מודולציה','gen'],
+ ['טרמולו','רטט עוצמה בקצב','מודולציה','gen'],
+ ['פילטר','סינון תדרים, סוויפים','יצירתי','gen'],
+ ['הרחבת סטריאו','מרחיב או מצמצם את התמונה','מיקס','gen'],
+ ['מולטיבנד','קומפרסור לכל טווח תדרים בנפרד','מאסטר','gen'],
+ ['לימיטר','מונע עיוות ומעלה עוצמה כללית','מאסטר','gen'],
+ ['מד עוצמה','LUFS לסטרימינג','מאסטר','gen'],
+ ['מתאם קצב וגובה','שינוי קצב בלי לשנות גובה ולהפך','כלים','gen'],
+];
+const LIB={
+ inst:[['פסנתר זקוף','פסנתרים','piano','var(--t5)','חינם'],['פסנתר כנף','פסנתרים','piano','var(--t5)','חינם'],['פסנתר חשמלי','קלידים','piano','var(--t5)','חינם'],['אורגן','קלידים','piano','var(--t5)','חינם'],['גיטרה אקוסטית','גיטרות','guitar','var(--t2)','חינם'],['גיטרה קלאסית','גיטרות','guitar','var(--t2)','חינם'],['גיטרה חשמלית נקייה','גיטרות','guitar','var(--t2)','חינם'],['גיטרה חשמלית רוק','גיטרות','guitar','var(--t2)','חינם'],['בוזוקי','ים תיכוני','guitar','var(--t2)','בקרוב'],['עוד','ים תיכוני','guitar','var(--t2)','בקרוב'],['בס אצבעות','בסים','bass','var(--t3)','חינם'],['קונטרבס','בסים','bass','var(--t3)','חינם'],['בס סינתי','בסים','bass','var(--t3)','חינם'],['ערכת תופים פופ','תופים','drums','var(--t4)','חינם'],['ערכת תופים רוק','תופים','drums','var(--t4)','חינם'],['דרבוקה','כלי הקשה','drums','var(--t4)','חינם'],['קחון ושייקר','כלי הקשה','drums','var(--t4)','חינם'],['כינורות','מיתרים','strings','var(--t6)','חינם'],['צ\'לו','מיתרים','strings','var(--t6)','חינם'],['חליל','נשיפה','flute','var(--t1)','חינם'],['חצוצרה','נשיפה','brass','var(--t1)','חינם'],['פד סינתי','סינתיסייזרים','synth','var(--t3)','חינם'],['לִיד סינתי','סינתיסייזרים','synth','var(--t3)','חינם'],['ספריית פסנתר פרימיום','פסנתרים','piano','var(--t5)','בתשלום']],
+ loops:[['לופ תופים פופ 96','תופים','drums','var(--t4)','חינם'],['מקצב מקסום דרבוקה','ים תיכוני','drums','var(--t4)','חינם'],['צ\'יפטטלי','ים תיכוני','drums','var(--t4)','חינם'],['פריטת גיטרה בלה מינור','גיטרות','guitar','var(--t2)','חינם'],['פד אווירה','סינתיסייזרים','synth','var(--t3)','חינם'],['מילוי תופים','תופים','drums','var(--t4)','חינם']],
+};
+const CATS={inst:['הכל','פסנתרים','קלידים','גיטרות','בסים','תופים','כלי הקשה','מיתרים','נשיפה','סינתיסייזרים','ים תיכוני'],loops:['הכל','תופים','גיטרות','סינתיסייזרים','ים תיכוני'],fx:['הכל','בסיסי','קול','גיטרה','מודולציה','צבע','מיקס','מאסטר']};
+let libTab='inst', libCat='הכל';
+const hist=[];
+
+// ---------- helpers ----------
+const toast=(t)=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('on'),2600)};
+const barW=()=>S.zoom*4; // px per bar (zoom = px per beat)
+const x=(bar)=>(bar-1)*barW();
+const secPerBar=()=>4*60/BPM;
+const fmtT=s=>{const m=Math.floor(s/60),r=s-m*60;return String(m).padStart(2,'0')+':'+r.toFixed(1).padStart(4,'0')};
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+function wavePath(n,w=400,h=40,density=1){seed=n*977+13;let up='',dn='';const N=160;for(let i=0;i<=N;i++){const t=i/N;const env=(0.35+0.65*Math.abs(Math.sin(t*Math.PI*(3+n%4))))*(0.6+0.4*rnd())*density;const a=Math.max(.04,env)*h/2;const px=(t*w).toFixed(1);up+=`${i?'L':'M'}${px},${(h/2-a).toFixed(1)}`;dn=`L${px},${(h/2+a).toFixed(1)}`+dn}return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${up}${dn}Z"/></svg>`}
+function midiSvg(n,bars){seed=n*31+5;let r='';const N=Math.max(4,bars*4);for(let i=0;i<N;i++){if(rnd()<.25)continue;const y=4+Math.floor(rnd()*26);r+=`<rect x="${(i/N*100).toFixed(2)}" y="${y}" width="${(100/N*0.8).toFixed(2)}" height="3" rx="1"/>`}return `<svg viewBox="0 0 100 34" preserveAspectRatio="none">${r}</svg>`}
+function snapshot(){hist.push(JSON.stringify(T));if(hist.length>80)hist.shift();$('#savedtxt').textContent='שומר…';setTimeout(()=>$('#savedtxt').textContent='נשמר',600)}
+
+// ---------- menus ----------
+const MENUS=[
+ ['קובץ',[['פרויקט חדש…','Ctrl+N'],['פתיחת פרויקט…','Ctrl+O'],['פרויקטים אחרונים',''],'-',['שמירה','Ctrl+S'],['שמירה בשם…','Ctrl+Shift+S'],['שמירה כתבנית…',''],['גרסאות ושחזור…',''],'-',['ייבוא קובץ שמע או MIDI…','Ctrl+I'],['ייצוא השיר לקובץ (WAV / MP3)…','Ctrl+E'],['ייצוא כל ערוץ לקובץ נפרד…',''],'-',['הגדרות שמע: מיקרופון ורמקולים…','']]],
+ ['עריכה',[['ביטול פעולה','Ctrl+Z'],['ביצוע שוב','Ctrl+Shift+Z'],['היסטוריית פעולות…','Alt+Z'],'-',['גזירה','Ctrl+X'],['העתקה','Ctrl+C'],['הדבקה','Ctrl+V'],['שכפול','Ctrl+D'],['מחיקה','Delete'],'-',['פיצול במיקום הסמן','Ctrl+T'],['חיבור קטעים','J'],['יישור לקצב (קוונטייז)','Q'],['בחירת הכל','Ctrl+A']]],
+ ['ערוץ',[['ערוץ חדש…','Ctrl+Alt+N'],['שכפול ערוץ',''],['מחיקת ערוץ',''],'-',['קיבוץ לתיקייה',''],['ערוץ אפקט משותף (ריוורב / דיליי)',''],['צבע ושם…',''],['הקפאה (חוסך מחשב)','']]],
+ ['הקלטה',[['הקלטה','R'],['ספירה לפני הקלטה',''],['מטרונום','K'],['לולאה','C'],['פאנץ\' – הקלטה בקטע מסומן','P'],'-',['הקלטה בלולאה ליצירת טייקים',''],['בחירת הטייק הטוב (תיקיית טייקים)',''],['לשמוע את עצמי בזמן הקלטה',''],['בדיקת מיקרופון ועוצמה…','']]],
+ ['מיקס',[['מיקסר','X'],['אפקטים לערוץ',''],['אוטומציה (שינוי עוצמה לאורך השיר)','A'],['מאסטר וייצוא','']]],
+ ['תצוגה',[['מפקח','I'],['ספרייה','Y'],['עורך תווים','E'],['עורך שמע',''],['מכונת תופים',''],'-',['הגדלה','Ctrl+='],['הקטנה','Ctrl+-'],['כל השיר במסך','Z']]],
+ ['עזרה',[['קיצורי מקלדת','?'],['מדריך התחלה מהירה',''],['שאלות נפוצות','']]],
+];
+$('#menus').innerHTML=MENUS.map(([n,items],i)=>`<div class="menu" data-i="${i}"><button>${n}</button><div class="drop">${items.map(it=>it==='-'?'<hr>':`<button data-cmd="${it[0]}"><span>${it[0]}</span><kbd>${it[1]}</kbd></button>`).join('')}</div></div>`).join('');
+$$('.menu>button').forEach(b=>b.onclick=e=>{const m=b.parentElement,o=m.classList.contains('open');$$('.menu').forEach(x=>x.classList.remove('open'));if(!o)m.classList.add('open');e.stopPropagation()});
+document.addEventListener('click',()=>$$('.menu').forEach(x=>x.classList.remove('open')));
+$$('.drop button').forEach(b=>b.onclick=()=>{const c=b.dataset.cmd;
+ if(c.startsWith('ערוץ חדש'))openNT();else if(c==='הקלטה')rec();else if(c==='מטרונום')$('#b-metro').click();else if(c==='לולאה')$('#b-cyc').click();else if(c.startsWith('פאנץ'))$('#b-punch').click();else if(c==='ביטול פעולה')undo();else if(c==='מיקסר')btab('mixer');else if(c==='עורך תווים')btab('piano');else if(c==='עורך שמע')btab('audio');else if(c==='מכונת תופים')btab('steps');else if(c==='אפקטים לערוץ')btab('fx');else if(c==='מאסטר וייצוא'||c.startsWith('ייצוא השיר'))btab('master');else if(c==='קיצורי מקלדת')$('#hp').classList.add('on');else if(c==='מפקח')view('insp');else if(c==='ספרייה')view('lib');else if(c==='מחיקת ערוץ')delTrack();else if(c==='שכפול ערוץ')dupTrack();else toast('בגרסה המלאה: '+c)});
+
+// ---------- tools ----------
+const TOOLS=[['ptr','בחירה והזזה (T)'],['pen','עיפרון – ציור תווים וקטעים'],['cut','מספריים – חיתוך קטע'],['glue','דבק – חיבור קטעים'],['erase','מחק'],['fade','דעיכה – כניסה ויציאה רכה'],['zoomt','זכוכית מגדלת'],['auto','אוטומציה']];
+$('#toolgrp').innerHTML=TOOLS.map(([k,t])=>`<button class="tool ${k==='ptr'?'on':''}" data-t="${k}" title="${t}">${ico(k)}</button>`).join('');
+$$('.tool').forEach(b=>b.onclick=()=>{S.tool=b.dataset.t;$$('.tool').forEach(x=>x.classList.toggle('on',x===b));toast(b.title)});
+
+// ---------- arrange ----------
+function renderRuler(){
+ const W=x(BARS+1);let h='';for(let b=1;b<=BARS;b++){h+=`<span style="left:${x(b)}px">${b}</span>`;if(S.zoom>=24)for(let q=1;q<4;q++)h+=`<span class="beat" style="left:${x(b)+q*S.zoom}px"></span>`}
+ $('#ruler').innerHTML=h+'<div class="cycle" id="cycle"></div><div class="punch" id="punch"></div>';
+ $('#g-mark').innerHTML=MARKS.map(([b,n],i)=>{const e=(MARKS[i+1]||[BARS+1])[0];return `<div class="marker" style="left:${x(b)}px;width:${x(e)-x(b)-3}px">${n}</div>`}).join('');
+ let ch='';for(let b=1;b<=BARS;b++)ch+=`<div class="chord" style="left:${x(b)}px">${CHORDS[(b-1)%8]}</div>`;$('#g-chord').innerHTML=ch;
+ [$('#ruler'),$('#g-mark'),$('#g-chord')].forEach(e=>e.style.width=W+'px');
+ updCycle();
+}
+function updCycle(){const c=$('#cycle'),p=$('#punch');c.classList.toggle('on',S.cycle.on);c.style.left=x(S.cycle.a)+'px';c.style.width=(x(S.cycle.b)-x(S.cycle.a))+'px';p.classList.toggle('on',S.punch.on);p.style.left=x(S.punch.a)+'px';p.style.width=(x(S.punch.b)-x(S.punch.a))+'px'}
+function gridBg(){const bw=barW();return `repeating-linear-gradient(90deg,#223040 0 1px,transparent 1px ${bw}px),repeating-linear-gradient(90deg,#172230 0 1px,transparent 1px ${S.zoom}px)`}
+function renderTracks(){
+ const anySolo=T.some(t=>t.s);
+ $('#heads').innerHTML=T.map((t,i)=>`<div class="th ${i===S.sel?'pk':''}" data-i="${i}" style="--c:${t.c}">
+  <div class="tic">${ico(t.icon)}</div>
+  <div class="tname">${t.name}<small>${t.sub}</small></div>
+  <button class="pill m ${t.m?'on':''}" data-k="m" title="השתקה (M)">M</button>
+  <button class="pill s ${t.s?'on':''}" data-k="s" title="סולו (S)">S</button>
+  ${t.type==='drums'?'':`<button class="pill r ${t.r?'on':''}" data-k="r" title="מוכן להקלטה">R</button>`}
+  </div>`).join('')+`<div class="newtrack-row"><button id="nt2">+ ערוץ חדש</button></div>`;
+ const W=x(BARS+1);
+ $('#lanes').innerHTML=T.map((t,i)=>`<div class="lane ${i===S.sel?'pk':''}" data-i="${i}" style="--c:${t.c};width:${W}px;background-image:${gridBg()};opacity:${(anySolo&&!t.s)||t.m?.4:1}">${t.regions.map((r,j)=>`<div class="region ${t.type!=='audio'?'midi':''} ${r.live?'live':''} ${r.takes>1?'takes':''} ${S.selRegion&&S.selRegion[0]===i&&S.selRegion[1]===j?'selr':''}" data-i="${i}" data-j="${j}" style="left:${x(r.a)}px;width:${Math.max(6,r.l*barW()-2)}px"><span class="rn">${r.live?'● מקליט…':r.n}${r.takes>1?` (${r.takes} טייקים)`:''}</span>${t.type==='audio'||r.live?wavePath(i*10+j+(r.live?99:0)):midiSvg(i*10+j,r.l)}</div>`).join('')}</div>`).join('')+'<div class="playhead" id="ph"></div>';
+ $('#nt2').onclick=openNT;
+ $$('.th').forEach(h=>h.onclick=e=>{const i=+h.dataset.i,k=e.target.closest('.pill')?.dataset.k;if(k){snapshot();T[i][k]=T[i][k]?0:1;if(k==='r'&&T[i].r)toast(`"${T[i].name}" מוכן להקלטה. לחץ על כפתור ההקלטה (R)`);renderAll();return}select(i)});
+ $$('.region').forEach(r=>{r.onclick=e=>{e.stopPropagation();S.selRegion=[+r.dataset.i,+r.dataset.j];select(+r.dataset.i,true)};r.ondblclick=()=>{const t=T[+r.dataset.i];btab(t.type==='audio'?'audio':t.type==='drums'?'steps':'piano')};dragRegion(r)});
+ movePH();
+}
+function dragRegion(el){el.onpointerdown=e=>{if(S.tool==='cut'){const i=+el.dataset.i,j=+el.dataset.j,r=T[i].regions[j];const lb=el.parentElement.getBoundingClientRect();const bar=Math.round((e.clientX-lb.left)/barW())+1;if(bar>r.a&&bar<r.a+r.l){snapshot();T[i].regions.splice(j+1,0,{a:bar,l:r.a+r.l-bar,n:r.n+' (2)'});r.l=bar-r.a;renderTracks();toast('הקטע נחתך לשניים')}return}
+ if(S.tool==='erase'){snapshot();T[+el.dataset.i].regions.splice(+el.dataset.j,1);renderTracks();toast('הקטע נמחק · Ctrl+Z לביטול');return}
+ const i=+el.dataset.i,j=+el.dataset.j,r=T[i].regions[j],x0=e.clientX,a0=r.a;let moved=false;el.setPointerCapture(e.pointerId);
+ el.onpointermove=ev=>{const d=Math.round((ev.clientX-x0)/barW());if(d&&!moved){snapshot();moved=true}r.a=Math.max(1,a0+d);el.style.left=x(r.a)+'px'};
+ el.onpointerup=()=>{el.onpointermove=null;if(moved)renderTracks()}}}
+function select(i,keep){S.sel=i;if(!keep)S.selRegion=null;renderAll()}
+function movePH(){const ph=$('#ph');if(!ph)return;const bars=S.pos/secPerBar();ph.style.left=(bars*barW())+'px';
+ const b=Math.floor(bars)+1,beat=Math.floor((bars%1)*4)+1,six=Math.floor(((bars*4)%1)*4)+1;$('#lcd-bars').textContent=`${b}.${beat}.${six}`;$('#lcd-time').textContent=fmtT(S.pos);
+ const L=$('#lanes'),vis=L.clientWidth;const px=bars*barW();if(S.playing&&(px>L.scrollLeft+vis-60||px<L.scrollLeft)){L.scrollLeft=Math.max(0,px-80)}syncScroll()}
+function syncScroll(){const sl=$('#lanes').scrollLeft;$('#rulerwrap').scrollLeft=sl;$('#heads').scrollTop=$('#lanes').scrollTop}
+$('#lanes').addEventListener('scroll',syncScroll);
+$('#lanes').addEventListener('wheel',e=>{if(e.shiftKey||Math.abs(e.deltaX)>Math.abs(e.deltaY)){$('#lanes').scrollLeft+=e.deltaX||e.deltaY;e.preventDefault()}else{$('#lanes').scrollTop+=e.deltaY}syncScroll()},{passive:false});
+$('#lanes').style.overflow='hidden';
+// ruler: click = move playhead, drag = cycle
+(()=>{const R=$('#ruler');R.onpointerdown=e=>{const rb=R.getBoundingClientRect();const toBar=cx=>Math.max(1,Math.round((cx-rb.left)/barW())+1);const a=toBar(e.clientX);let dragged=false;
+ R.onpointermove=ev=>{const b=toBar(ev.clientX);if(Math.abs(b-a)>=1){dragged=true;S.cycle={on:true,a:Math.min(a,b),b:Math.max(a,b)};$('#b-cyc').classList.add('on');updCycle()}};
+ R.onpointerup=ev=>{R.onpointermove=null;if(!dragged){S.pos=(toBar(ev.clientX)-1)*secPerBar();movePH()}else toast(`לולאה: תיבות ${S.cycle.a}–${S.cycle.b}`)};R.setPointerCapture(e.pointerId)}})();
+
+// ---------- inspector ----------
+function renderInsp(){const t=T[S.sel];if(!t)return;
+ const r=S.selRegion?T[S.selRegion[0]].regions[S.selRegion[1]]:null;
+ $('#insp').innerHTML=`<div class="ptitle">מפקח <span class="muted">הערוץ הנבחר</span></div><div class="insp-body">
+ <div class="trk-id"><div class="ic" style="color:${t.c}">${ico(t.icon)}</div><div><b>${t.name}</b><small>${t.sub}</small></div></div>
+ ${r?`<div class="sect">קטע נבחר: ${r.n}</div><div class="row"><span class="lbl">עוצמת קטע</span><span class="ltr">0.0 dB</span></div><div class="row"><span class="lbl">כניסה / יציאה רכה</span><span class="ltr">20 / 300 ms</span></div>${t.type!=='audio'?'<div class="row"><span class="lbl">יישור לקצב</span><select class="sel"><option>כבוי</option><option>1/8</option><option>1/16</option></select></div>':''}`:''}
+ <div class="sect">צליל</div>
+ <div class="row"><span class="lbl">${t.type==='audio'?'כניסה':'כלי'}</span><select class="sel">${t.type==='audio'?'<option>מיקרופון 1</option><option>מיקרופון 2</option>':`<option>${t.sub.split('· ')[1]||'כלי'}</option>`}</select></div>
+ <div class="sect">אפקטים (לפי הסדר)</div>
+ ${[0,1,2,3,4].map(k=>t.inserts[k]?`<button class="slot" data-fx="${t.inserts[k]}"><i></i>${t.inserts[k]}</button>`:`<button class="slot empty" data-add="1">+ הוספת אפקט</button>`).slice(0,Math.min(5,t.inserts.length+1)).join('')}
+ <div class="sect">שליחות לערוצי אפקט</div>
+ <div class="row"><span class="lbl">ריוורב (חדר)</span><input type="range" value="${t.sends.rev}" style="width:100px;accent-color:var(--gold)"></div>
+ <div class="row"><span class="lbl">דיליי (הד)</span><input type="range" value="${t.sends.del}" style="width:100px;accent-color:var(--gold)"></div>
+ <div class="row"><span class="lbl">יציאה</span><span>יציאה ראשית</span></div>
+ <div class="strip-mini">
+   <div class="kwrap"><div class="knob" style="--a:${t.pan*1.35}deg" data-pan></div>פאן ${t.pan?(t.pan<0?'ש':'י')+Math.abs(t.pan):'אמצע'}</div>
+   <input class="vfader" type="range" min="0" max="100" value="${t.vol}" data-vol>
+   <div class="meter"><i data-meter="${S.sel}"></i></div>
+ </div>
+ <div class="row" style="justify-content:center"><span class="ltr lbl">${((t.vol-80)/4).toFixed(1)} dB</span></div>
+ <div class="msri" style="justify-content:center"><button class="pill m ${t.m?'on':''}" data-k="m">M</button><button class="pill s ${t.s?'on':''}" data-k="s">S</button>${t.type!=='drums'?`<button class="pill r ${t.r?'on':''}" data-k="r">R</button><button class="pill i ${t.i?'on':''}" data-k="i" title="לשמוע את עצמי">I</button>`:''}</div>
+ </div>`;
+ $$('#insp .pill').forEach(p=>p.onclick=()=>{snapshot();t[p.dataset.k]=t[p.dataset.k]?0:1;renderAll()});
+ $$('#insp [data-fx]').forEach(s=>s.onclick=()=>openPlug(s.dataset.fx));
+ $$('#insp [data-add]').forEach(s=>s.onclick=()=>{btab('fx');toast('בחר אפקט מהרשימה כדי להוסיף אותו לערוץ')});
+ $('#insp [data-vol]').oninput=e=>{t.vol=+e.target.value;renderMixer()};
+ knobDrag($('#insp [data-pan]'),v=>{t.pan=Math.round(v);renderInsp()},t.pan);
+}
+function knobDrag(el,cb,v0){if(!el)return;el.onpointerdown=e=>{const y0=e.clientY;el.setPointerCapture(e.pointerId);el.onpointermove=ev=>{const v=Math.max(-100,Math.min(100,v0+(y0-ev.clientY)));el.style.setProperty('--a',v*1.35+'deg');el._v=v};el.onpointerup=()=>{el.onpointermove=null;if(el._v!=null)cb(el._v)}}}
+
+// ---------- library ----------
+function renderLib(){
+ $$('#libtabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.l===libTab));
+ if(libTab==='ai'){$('#chips').innerHTML='';$('#items').innerHTML=`<div class="assist-off"><b>העוזר החכם יגיע בשלב הבא.</b><br>קודם בונים אולפן מלא שעובד בעכבר ובמקלדת. אחר כך העוזר "ילחץ" בשבילך על אותם כפתורים בדיוק: "תתחיל הקלטה", "תשתיק את התופים", "תוסיף ערוץ גיטרה". הוא לא יוסיף שום דבר בלי שתבקש ויאשר.</div>`;return}
+ $('#chips').innerHTML=CATS[libTab].map(c=>`<button class="chip ${c===libCat?'on':''}">${c}</button>`).join('');
+ $$('#chips .chip').forEach(c=>c.onclick=()=>{libCat=c.textContent;renderLib()});
+ const q=$('#libq').value.trim();
+ let list=libTab==='fx'?FX.map(f=>[f[0],f[2],'fx','var(--t7)','חינם',f[1]]):LIB[libTab];
+ list=list.filter(it=>(libCat==='הכל'||it[1]===libCat)&&(!q||it[0].includes(q)||it[1].includes(q)));
+ $('#items').innerHTML=list.map(it=>`<div class="item" style="--c:${it[3]}"><div class="ic">${ico(it[2])}</div><div class="t"><b>${it[0]}</b><small>${it[5]||it[1]}</small></div><span class="lic ${it[4]==='בתשלום'?'paid':''}">${it[4]}</span>${libTab!=='fx'?`<button class="mini" title="השמעה">${ico('play')}</button>`:''}<button class="mini" title="${libTab==='fx'?'הוספה לערוץ הנבחר':'הוספה כערוץ חדש'}" data-add="${it[0]}">${ico('plus')}</button></div>`).join('')||'<div class="assist-off">לא נמצא. נסה מילה אחרת.</div>';
+ $$('#items [data-add]').forEach(b=>b.onclick=()=>{const n=b.dataset.add;if(libTab==='fx'){snapshot();T[S.sel].inserts.push(n);renderAll();toast(`"${n}" נוסף לערוץ "${T[S.sel].name}"`)}else{const it=list.find(x=>x[0]===n);addTrack({name:n,sub:'כלי וירטואלי · '+n,type:it[2]==='drums'?'drums':'midi',icon:it[2],c:it[3]})}});
+ $$('#items .mini[title="השמעה"]').forEach(b=>b.onclick=()=>toast('השמעת דוגמה של הצליל'));
+}
+$$('#libtabs .tab').forEach(b=>b.onclick=()=>{libTab=b.dataset.l;libCat='הכל';renderLib()});
+$('#libq').oninput=renderLib;
+
+// ---------- bottom panes ----------
+function btab(k){if($('#app').classList.contains('no-bot'))view('bot');$$('.btab').forEach(b=>b.classList.toggle('on',b.dataset.b===k));$$('.bpane').forEach(p=>p.classList.toggle('on',p.id==='p-'+k));renderBottom()}
+$$('.btab').forEach(b=>b.onclick=()=>btab(b.dataset.b));
+const curB=()=>($('.btab.on')||{}).dataset?.b||'mixer';
+function renderBottom(){const k=curB(),t=T[S.sel];$('#bctx').textContent=k==='mixer'||k==='master'?'':`ערוץ: ${t.name}`;
+ ({mixer:renderMixer,piano:renderPiano,audio:renderAudio,steps:renderSteps,fx:renderFx,master:renderMaster})[k]()}
+function stripHtml(t,i,cls=''){return `<div class="strip ${cls} ${i===S.sel?'pk':''}" data-i="${i}" style="--c:${t.c}">
+ <div class="nm" title="${t.name}">${t.name}</div>
+ <div class="ins">${(t.inserts||[]).slice(0,2).map(f=>`<button data-fx="${f}">${f}</button>`).join('')}<button class="empty" data-addfx>+ אפקט</button></div>
+ <div class="kwrap"><div class="knob" style="--a:${(t.pan||0)*1.35}deg"></div></div>
+ <div class="fm"><input class="vfader" type="range" min="0" max="100" value="${t.vol}" data-v="${i}"><div class="meter"><i data-meter="${cls==='master'?'m':i}"></i></div></div>
+ <div class="db">${((t.vol-80)/4).toFixed(1)} dB</div>
+ ${cls?'':`<div class="msri"><button class="pill m ${t.m?'on':''}" data-k="m">M</button><button class="pill s ${t.s?'on':''}" data-k="s">S</button></div>`}
+ </div>`}
+function renderMixer(){const p=$('#p-mixer');p.innerHTML=T.map((t,i)=>stripHtml(t,i)).join('')+'<div class="mixsep"></div>'+AUX.map((a,i)=>stripHtml(a,100+i,'aux')).join('')+'<div class="mixsep"></div>'+stripHtml({name:'יציאה ראשית',c:'var(--gold)',vol:80,inserts:['אקולייזר','לימיטר']},-1,'master');
+ $$('#p-mixer .strip').forEach(s=>{const i=+s.dataset.i;s.onclick=e=>{if(e.target.closest('[data-fx]'))return openPlug(e.target.closest('[data-fx]').dataset.fx);if(e.target.closest('[data-addfx]')){if(i>=0&&i<100)select(i);btab('fx');return}const k=e.target.closest('.pill')?.dataset.k;if(k&&T[i]){snapshot();T[i][k]=T[i][k]?0:1;renderAll()}else if(T[i]&&!e.target.matches('input'))select(i)}});
+ $$('#p-mixer [data-v]').forEach(f=>f.oninput=()=>{const i=+f.dataset.v;if(T[i]){T[i].vol=+f.value;f.closest('.strip').querySelector('.db').textContent=((T[i].vol-80)/4).toFixed(1)+' dB'}})}
+function renderPiano(){const t=T[S.sel];const p=$('#p-piano');
+ if(t.type==='audio'){p.innerHTML=`<div class="ae"><div class="assist-off">"${t.name}" הוא ערוץ שמע. עורך התווים מיועד לכלים וירטואליים. לחץ פעמיים על קטע שמע כדי לפתוח את עורך השמע.</div></div>`;return}
+ const lo=36,hi=72,names=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];let keys='';for(let n=hi;n>=lo;n--){const b=names[n%12].includes('#');keys+=`<div class="key ${b?'b':''}">${n%12===0?'C'+(Math.floor(n/12)-1):''}</div>`}
+ seed=S.sel*101+3;let notes='',vel='';const beats=32;for(let i=0;i<beats*2;i++){if(rnd()<.35)continue;const n=lo+6+Math.floor(rnd()*22);const len=rnd()<.3?2:1;notes+=`<div class="note" style="--c:${t.c};left:${i*S.zoom/2}px;width:${len*S.zoom/2-2}px;top:${(hi-n)*14+1}px"></div>`;vel+=`<i style="left:${i*S.zoom/2+2}px;height:${20+rnd()*30}px"></i>`}
+ p.innerHTML=`<div class="pr"><div class="keys">${keys}</div><div class="prgrid" id="prgrid" style="background-image:repeating-linear-gradient(0deg,#1b2430 0 1px,transparent 1px 14px),repeating-linear-gradient(90deg,#2a3746 0 1px,transparent 1px ${barW()}px),repeating-linear-gradient(90deg,#18212b 0 1px,transparent 1px ${S.zoom/2}px)">${notes}</div><div class="prside">עוצמת תו</div><div class="vel">${vel}</div></div>`;
+ $('#prgrid').onclick=e=>{if(e.target.classList.contains('note')){e.target.remove();toast('התו נמחק');return}const r=e.currentTarget.getBoundingClientRect();const d=document.createElement('div');d.className='note';d.style.cssText=`--c:${t.c};left:${Math.floor((e.clientX-r.left)/(S.zoom/2))*(S.zoom/2)}px;width:${S.zoom/2-2}px;top:${Math.floor((e.clientY-r.top)/14)*14+1}px`;e.currentTarget.appendChild(d);toast('תו נוסף. לחיצה על תו מוחקת אותו')}}
+function renderAudio(){const t=T[S.sel];const p=$('#p-audio');
+ if(t.type!=='audio'){p.innerHTML=`<div class="ae"><div class="assist-off">"${t.name}" הוא כלי וירטואלי. עורך השמע מיועד להקלטות (שירה, גיטרה, מיקרופון).</div></div>`;return}
+ const r=S.selRegion&&S.selRegion[0]===S.sel?t.regions[S.selRegion[1]]:t.regions[0];
+ p.innerHTML=`<div class="ae"><div class="bar"><b>${r?r.n:'אין הקלטה'}</b>${r&&r.takes>1?`<select class="sel">${Array.from({length:r.takes},(_,k)=>`<option>טייק ${r.takes-k}</option>`).join('')}</select><button class="btn">הרכבת טייק מהקטעים הטובים</button>`:''}<span style="flex:1"></span><button class="btn">כניסה רכה</button><button class="btn">יציאה רכה</button><button class="btn">נרמול עוצמה</button><button class="btn">היפוך</button><button class="btn">הסרת רעש</button><button class="btn" title="כמו כוונון קול, ידני">תיקון גובה תווים</button><button class="btn">שינוי קצב</button></div>
+ <div class="wave" style="--c:${t.c}">${wavePath(S.sel*10+(S.selRegion?S.selRegion[1]:0),800,100).replace('<svg','<svg style="fill:'+t.c+'"')}</div></div>`}
+const STEPS=[['קיק',[0,4,8,12]],['סנר',[4,12]],['היי-האט סגור',[0,2,4,6,8,10,12,14]],['היי-האט פתוח',[14]],['קלאפ',[]],['טום',[]],['דרבוקה דום',[0,6,8]],['דרבוקה טק',[2,3,10,11,14]]];
+function renderSteps(){$('#p-steps').innerHTML=`<div class="seq" id="seq">${STEPS.map(([n,on],r)=>`<div class="seqrow"><span class="nm">${n}</span>${Array.from({length:16},(_,i)=>`<button class="step ${on.includes(i)?'on':''}" data-r="${r}" data-i="${i}"></button>`).join('')}</div>`).join('')}</div>`;
+ $$('.step').forEach(s=>s.onclick=()=>{const r=STEPS[+s.dataset.r][1],i=+s.dataset.i,k=r.indexOf(i);k<0?r.push(i):r.splice(k,1);s.classList.toggle('on')})}
+function renderFx(){const t=T[S.sel];$('#p-fx').innerHTML=`<div class="fx"><div class="chain"><div class="sect">שרשרת האפקטים של "${t.name}" – מלמעלה למטה</div>${t.inserts.map((f,k)=>`<button class="slot" data-fx="${f}"><i></i><span style="flex:1">${k+1}. ${f}</span><span class="lbl">פתיחה</span></button>`).join('')||'<div class="assist-off">אין עדיין אפקטים בערוץ הזה.</div>'}<div class="sect" style="margin-top:6px">שליחות: ריוורב ${t.sends.rev}% · דיליי ${t.sends.del}%</div></div>
+ <div class="fxgrid">${FX.map(f=>`<button class="fxcard" data-add="${f[0]}"><span class="tag">${f[2]}</span><b>${f[0]}</b><small>${f[1]}</small></button>`).join('')}</div></div>`;
+ $$('#p-fx [data-fx]').forEach(s=>s.onclick=()=>openPlug(s.dataset.fx));
+ $$('#p-fx [data-add]').forEach(b=>b.onclick=()=>{snapshot();t.inserts.push(b.dataset.add);renderAll();toast(`"${b.dataset.add}" נוסף לערוץ "${t.name}"`)})}
+function renderMaster(){$('#p-master').innerHTML=`<div class="mst">
+ <div class="box"><h4>שרשרת מאסטר</h4>${['אקולייזר','קומפרסור','מולטיבנד','לימיטר'].map(f=>`<button class="slot" data-fx="${f}"><i></i>${f}</button>`).join('')}<div class="row"><span class="lbl">יעד</span><select class="sel"><option>סטרימינג (ספוטיפיי/יוטיוב) −14</option><option>רדיו / מועדון −9</option><option>שקט ודינמי −18</option></select></div></div>
+ <div class="box"><h4>עוצמה כוללת</h4><div class="big" id="lufs">−14.2 LUFS</div><div class="row"><span class="lbl">שיא אמיתי</span><span class="ltr">−1.0 dBTP</span></div><div class="row"><span class="lbl">טווח דינמי</span><span class="ltr">7.8 LU</span></div><div class="grm"><i style="width:62%"></i></div></div>
+ <div class="box"><h4>ייצוא</h4><div class="row"><span class="lbl">פורמט</span><select class="sel"><option>WAV 24 ביט</option><option>MP3 320</option><option>FLAC</option></select></div><div class="row"><span class="lbl">מה לייצא</span><select class="sel"><option>כל השיר</option><option>הלולאה בלבד</option><option>כל ערוץ בנפרד</option></select></div><button class="btn gold" id="exp">ייצוא לקובץ</button></div></div>`;
+ $$('#p-master [data-fx]').forEach(s=>s.onclick=()=>openPlug(s.dataset.fx));$('#exp').onclick=()=>toast('בגרסה המלאה: השיר נשמר כקובץ במחשב')}
+
+// ---------- plugin window ----------
+const PRESETS={'אקולייזר':['ברירת מחדל','שירה בהירה','הורדת בוץ','גיטרה אקוסטית','בס עגול'],'קומפרסור':['ברירת מחדל','שירה','תופים פאנץ\'','בס יציב'],'_':['ברירת מחדל','עדין','בינוני','חזק']};
+const KN={'ריוורב':['גודל חדר','זמן דעיכה','השהיה לפני','בהירות','רטוב/יבש'],'דיליי':['זמן (בקצב)','חזרות','בהירות','רטוב/יבש'],'כוונון קול':['סולם','מהירות תיקון','טבעיות','רטוב/יבש'],'דה-אסר':['תדר','סף','עוצמת הורדה'],'גייט':['סף','שחרור','טווח'],'לימיטר':['תקרה','שחרור','הגברה'],'סטורציה':['חום','צבע','רטוב/יבש'],'_':['עומק','קצב','צבע','רטוב/יבש']};
+function openPlug(name){$('#pw-title').textContent=name+' · '+(T[S.sel]?.name||'מאסטר');$('#pw-preset').innerHTML=(PRESETS[name]||PRESETS._).map(p=>`<option>${p}</option>`).join('');const b=$('#pw-body');
+ if(name==='אקולייזר'){let bands=[[80,3],[250,-2],[1200,0],[4000,2],[10000,3]];
+  const draw=()=>{const W=600,H=190,fx=f=>Math.log10(f/20)/3*W,fy=g=>H/2-g*6;let d='';for(let i=0;i<=120;i++){const f=20*Math.pow(1000,i/120);let g=0;bands.forEach(([bf,bg])=>{g+=bg*Math.exp(-Math.pow(Math.log2(f/bf),2)*1.6)});d+=(i?'L':'M')+fx(f).toFixed(1)+','+fy(g).toFixed(1)}
+   b.innerHTML=`<svg class="eqsvg" viewBox="0 0 600 190" preserveAspectRatio="none">${[100,1000,10000].map(f=>`<line x1="${fx(f)}" x2="${fx(f)}" y1="0" y2="190" stroke="#1d2733"/><text x="${fx(f)+3}" y="184" fill="#5c6878" font-size="10">${f>=1000?f/1000+'k':f}Hz</text>`).join('')}<line x1="0" x2="600" y1="95" y2="95" stroke="#263241"/><path d="${d}" stroke="#e2b47e" stroke-width="2.2" fill="none"/>${bands.map(([f,g],k)=>`<circle class="dot" data-k="${k}" cx="${fx(f)}" cy="${fy(g)}" r="7"/>`).join('')}</svg><div class="knobs">${bands.map(([f,g],k)=>`<div class="kwrap"><b>${g>0?'+':''}${g.toFixed(1)} dB</b>${['בס','נמוך-אמצע','אמצע','גבוה','אוויר'][k]} · ${f>=1000?(f/1000).toFixed(1)+'k':Math.round(f)}</div>`).join('')}</div><div class="lbl">גרור את הנקודות: למעלה מגביר, למטה מנמיך, לצדדים משנה תדר.</div>`;
+   const svg=b.querySelector('svg');$$('#pw-body .dot').forEach(dot=>dot.onpointerdown=e=>{const k=+dot.dataset.k;dot.setPointerCapture(e.pointerId);dot.onpointermove=ev=>{const r=svg.getBoundingClientRect();const px=(ev.clientX-r.left)/r.width*600,py=(ev.clientY-r.top)/r.height*190;bands[k]=[Math.max(20,Math.min(20000,20*Math.pow(1000,px/600))),Math.max(-15,Math.min(15,(95-py)/6))];draw()}})};draw()}
+ else if(name==='קומפרסור'){b.innerHTML=`<div class="knobs">${[['סף','−18 dB',-40],['יחס','4:1',30],['התקפה','10 ms',-20],['שחרור','120 ms',10],['הגברה','+4 dB',25],['רטוב/יבש','100%',100]].map(([n,v,a])=>`<div class="kwrap"><div class="knob" style="--a:${a}deg"></div><b>${v}</b>${n}</div>`).join('')}</div><div class="lbl">הורדת עוצמה ברגע זה</div><div class="grm"><i id="gr"></i></div><div class="lbl">הקומפרסור מחליש את החלקים החזקים, כך שהקול נשמע יציב ו"קדימה" במיקס.</div>`;
+  $$('#pw-body .knob').forEach(k=>knobDrag(k,()=>{},0))}
+ else{const ks=KN[name]||KN._;b.innerHTML=`<div class="knobs">${ks.map((n,i)=>`<div class="kwrap"><div class="knob" style="--a:${(i*37%120)-60}deg"></div><b>${50+i*7}%</b>${n}</div>`).join('')}</div><div class="lbl">${(FX.find(f=>f[0]===name)||[])[1]||''}</div>`;$$('#pw-body .knob').forEach(k=>knobDrag(k,()=>{},0))}
+ $('#pw').classList.add('on')}
+$('#pw-bypass').onclick=e=>{e.target.classList.toggle('gold');toast(e.target.classList.contains('gold')?'האפקט עקוף – שומעים בלעדיו':'האפקט פעיל')};
+
+// ---------- new track ----------
+const TYPES=[['audio','mic','שמע – מיקרופון','שירה, גיטרה אקוסטית, כל מה שמקליטים במיקרופון'],['inst','piano','כלי וירטואלי','פסנתר, בס, מיתרים, סינתיסייזר – מנגנים במקלדת או מציירים תווים'],['drums','drums','תופים','ערכת תופים, דרבוקה, כלי הקשה – מכונת תופים או מקלדת'],['guitar','guitar','גיטרה / בס חשמלי','חיבור כלי בכבל, עם מגבר ואפקטים'],['aux','fx','ערוץ אפקט משותף','ריוורב או דיליי שכמה ערוצים שולחים אליו'],['folder','folder','תיקייה','קיבוץ כמה ערוצים יחד (למשל כל התופים)']];
+let ntType='audio';
+function openNT(){$('#types').innerHTML=TYPES.map(([k,i,n,d])=>`<button class="type ${k===ntType?'on':''}" data-k="${k}"><div class="ic">${ico(i)}</div><div><b>${n}</b><small>${d}</small></div></button>`).join('');
+ $$('.type').forEach(b=>b.onclick=()=>{ntType=b.dataset.k;openNT()});
+ const insts={audio:['—'],inst:['פסנתר זקוף','פסנתר חשמלי','בס אצבעות','כינורות','פד סינתי'],drums:['ערכת פופ','ערכת רוק','דרבוקה','קחון'],guitar:['מגבר נקי','מגבר רוק','בס חשמלי'],aux:['ריוורב','דיליי'],folder:['—']};
+ $('#nt-inst').innerHTML=insts[ntType].map(x=>`<option>${x}</option>`).join('');$('#nt-in').disabled=!['audio','guitar'].includes(ntType);
+ $('#nt').classList.add('on')}
+$('#addtrack').onclick=openNT;
+$('#nt-ok').onclick=()=>{const n=Math.max(1,Math.min(16,+$('#nt-n').value||1));const inst=$('#nt-inst').value;const ty=TYPES.find(t=>t[0]===ntType);
+ for(let k=0;k<n;k++)addTrack({name:($('#nt-name').value||(ntType==='audio'?'שמע':inst!=='—'?inst:ty[2]))+(n>1?' '+(k+1):''),sub:ty[2]+(inst!=='—'?' · '+inst:''),type:ntType==='audio'||ntType==='guitar'?'audio':ntType==='drums'?'drums':'midi',icon:ty[1],c:$('#nt-color').value,r:$('#nt-arm').checked?1:0,i:$('#nt-mon').checked?1:0},true);
+ $('#nt').classList.remove('on');$('#nt-name').value='';if($('#nt-lib').checked){view('lib',true);libTab='inst';renderLib()}};
+function addTrack(o,quiet){snapshot();T.push(Object.assign({vol:70,pan:0,m:0,s:0,r:0,i:0,inserts:[],sends:{rev:0,del:0},regions:[]},o));S.sel=T.length-1;renderAll();if(!quiet||true)toast(`נוצר ערוץ "${o.name}"${o.r?' – מוכן להקלטה':''}`)}
+function delTrack(){if(!T.length)return;snapshot();const n=T[S.sel].name;T.splice(S.sel,1);S.sel=Math.max(0,S.sel-1);renderAll();toast(`הערוץ "${n}" נמחק · Ctrl+Z לביטול`)}
+function dupTrack(){snapshot();const c=JSON.parse(JSON.stringify(T[S.sel]));c.name+=' (עותק)';T.splice(S.sel+1,0,c);S.sel++;renderAll()}
+function undo(){if(!hist.length)return toast('אין מה לבטל');T.splice(0,T.length,...JSON.parse(hist.pop()));S.sel=Math.min(S.sel,T.length-1);renderAll();toast('בוטלה הפעולה האחרונה')}
+$('#undo').onclick=undo;$('#redo').onclick=()=>toast('ביצוע שוב');
+$$('[data-close]').forEach(b=>b.onclick=()=>b.closest('.scrim').classList.remove('on'));
+$$('.scrim').forEach(s=>s.onclick=e=>{if(e.target===s)s.classList.remove('on')});
+
+// ---------- views ----------
+function view(k,force){toggleView(k,force?true:undefined)}
+function toggleView(k,state){const a=$('#app'),cls='no-'+k;const on=state===undefined?a.classList.contains(cls):state;a.classList.toggle(cls,!on);$$(`.vbtn[data-view="${k}"]`).forEach(b=>b.classList.toggle('on',on));setTimeout(()=>{renderRuler();renderTracks()},20)}
+$$('.vbtn').forEach(b=>b.onclick=()=>toggleView(b.dataset.view));
+
+// ---------- transport ----------
+let raf=0,last=0,beatClick=-1,countTimer=0;
+function setState(){const L=$('#lcd');L.classList.toggle('recording',S.recording);$('#lcd-state').textContent=S.recording?'● מקליט':S.playing?'▶ מנגן':'עצור';$('#b-play').classList.toggle('on',S.playing);$('#b-rec').classList.toggle('on',S.recording);$('#arr').classList.toggle('recording',S.recording)}
+function tick(ts){if(!S.playing)return;const dt=last?(ts-last)/1000:0;last=ts;S.pos+=dt;const spb=secPerBar();
+ if(S.cycle.on&&S.pos>=(S.cycle.b-1)*spb){S.pos=(S.cycle.a-1)*spb;if(S.recording){S.takes++;$$('.region.live .rn').forEach(e=>e.textContent=`● מקליט… טייק ${S.takes+1}`)}}
+ if(S.recording){const bars=S.pos/spb+1;T.forEach((t,i)=>{const lr=t.regions.find(r=>r.live);if(lr){const startB=S.cycle.on?S.cycle.a:lr.a;lr.l=Math.max(.05,(S.cycle.on?Math.max(bars,lr.a+lr.l):bars)-startB);const el=$(`.region.live[data-i="${i}"]`);if(el)el.style.width=Math.max(6,lr.l*barW()-2)+'px'}})}
+ $$('[data-meter]').forEach(m=>{const i=m.dataset.meter;const t=T[+i];const live=t?(!t.m&&(t.regions.some(r=>{const b=S.pos/spb+1;return b>=r.a&&b<r.a+r.l})||(S.recording&&t.r))):true;m.style.height=(live?40+Math.random()*45:0)+'%'});
+ movePH();raf=requestAnimationFrame(tick)}
+function play(){if(S.playing)return stop();S.playing=true;last=0;setState();raf=requestAnimationFrame(tick)}
+function stop(){const wasRec=S.recording;if(S.playing||S.recording){S.playing=false;if(S.recording)finishRec();S.recording=false;cancelAnimationFrame(raf);clearInterval(countTimer);$('#countin').classList.remove('on');$$('[data-meter]').forEach(m=>m.style.height='0');setState();if(!wasRec)toast('נעצר')}else{S.pos=S.cycle.on?(S.cycle.a-1)*secPerBar():0;movePH()}}
+function rec(){if(S.recording)return stop();const armed=T.filter(t=>t.r&&t.type!=='drums');
+ if(!armed.length){toast('קודם בוחרים איפה להקליט: לוחצים R על ערוץ, או יוצרים ערוץ חדש');$$('.th .pill.r').forEach(p=>{p.animate([{boxShadow:'0 0 0 0 rgba(239,75,79,.8)'},{boxShadow:'0 0 0 8px rgba(239,75,79,0)'}],{duration:900,iterations:2})});return}
+ if(S.punch.on&&!S.cycle.on){S.pos=Math.max(0,(S.punch.a-2)*secPerBar())}
+ if(S.cycle.on)S.pos=(S.cycle.a-1)*secPerBar();
+ const begin=()=>{S.recording=true;S.takes=0;const b=S.pos/secPerBar()+1;T.forEach(t=>{if(t.r&&t.type!=='drums')t.regions.push({a:S.cycle.on?S.cycle.a:Math.round(b*4)/4,l:.05,n:'הקלטה חדשה',live:1})});renderTracks();setState();if(!S.playing){S.playing=true;last=0;raf=requestAnimationFrame(tick)}};
+ if(S.count){let n=1;const ci=$('#countin');ci.textContent=n;ci.classList.add('on');$('#lcd-state').textContent='1-2-3-4';countTimer=setInterval(()=>{n++;if(n>4){clearInterval(countTimer);ci.classList.remove('on');begin()}else ci.textContent=n},60000/BPM)}else begin()}
+function finishRec(){let made=0;T.forEach(t=>t.regions.forEach(r=>{if(r.live){delete r.live;made++;const k=(t.regions.filter(x=>x.n.startsWith(t.name.split(' ')[0])).length)+1;r.n=`${t.name} · טייק ${k}`;if(S.takes>0)r.takes=S.takes+1}}));snapshot();renderAll();toast(made?`ההקלטה נשמרה${S.takes?` · ${S.takes+1} טייקים בתיקייה`:''}. לחץ רווח כדי לשמוע`:'')}
+$('#b-play').onclick=play;$('#b-stop').onclick=stop;$('#b-rec').onclick=rec;
+$('#b-start').onclick=()=>{S.pos=0;movePH()};
+$('#b-rew').onclick=()=>{S.pos=Math.max(0,S.pos-secPerBar());movePH()};$('#b-ff').onclick=()=>{S.pos+=secPerBar();movePH()};
+$('#b-cyc').onclick=e=>{S.cycle.on=!S.cycle.on;e.currentTarget.classList.toggle('on',S.cycle.on);updCycle();toast(S.cycle.on?`לולאה פעילה: תיבות ${S.cycle.a}–${S.cycle.b} · גרור על הסרגל כדי לשנות`:'לולאה כבויה')};
+$('#b-punch').onclick=e=>{S.punch.on=!S.punch.on;e.currentTarget.classList.toggle('on',S.punch.on);updCycle();toast(S.punch.on?`פאנץ': ההקלטה תתבצע רק בתיבות ${S.punch.a}–${S.punch.b} (הפס האדום)`:'פאנץ\' כבוי')};
+$('#b-metro').onclick=e=>{S.metro=!S.metro;e.currentTarget.classList.toggle('on',S.metro);toast(S.metro?'מטרונום פועל':'מטרונום כבוי')};
+$('#b-count').onclick=e=>{S.count=!S.count;e.currentTarget.classList.toggle('on',S.count);toast(S.count?'ספירה 1-2-3-4 לפני הקלטה':'הקלטה מתחילה מיד')};
+$('#lcd-bpm').onchange=e=>{const v=Math.max(30,Math.min(300,+e.target.value||96));e.target.value=v;const p=S.pos/secPerBar();BPM=v;S.pos=p*secPerBar();movePH();toast('קצב: '+v)};
+$('#zoom').oninput=e=>{S.zoom=+e.target.value;renderRuler();renderTracks();if(curB()==='piano')renderPiano()};
+$('#th').oninput=e=>document.documentElement.style.setProperty('--th',e.target.value+'px');
+
+// ---------- keys ----------
+const KEYS=[['רווח','ניגון / עצירה (גם עוצר הקלטה)'],['R','הקלטה'],['Enter','חזרה להתחלה'],['C','לולאה'],['K','מטרונום'],['P','פאנץ\''],[', / .','תיבה אחורה / קדימה'],['M / S','השתקה / סולו לערוץ הנבחר'],['↑ / ↓','מעבר בין ערוצים'],['X','מיקסר'],['E','עורך תווים'],['I','מפקח'],['Y','ספרייה'],['Ctrl+Alt+N','ערוץ חדש'],['Ctrl+Z','ביטול פעולה'],['Delete','מחיקת הקטע הנבחר'],['?','החלון הזה']];
+$('#helpgrid').innerHTML=KEYS.map(([k,d])=>`<div><span>${d}</span><span class="kbd" style="font-size:12px;color:var(--gold)">${k}</span></div>`).join('');
+$('#helpbtn').onclick=()=>$('#hp').classList.add('on');
+document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea'))return;const k=e.key;
+ if(k==='Escape')return $$('.scrim').forEach(s=>s.classList.remove('on'));
+ if(k===' '){e.preventDefault();return S.playing||S.recording?stop():play()}
+ if(e.ctrlKey&&e.altKey&&(k==='n'||k==='N'||k==='מ')){e.preventDefault();return openNT()}
+ if(e.ctrlKey&&(k==='z'||k==='ז')){e.preventDefault();return undo()}
+ const map={r:rec,'ר':rec,Enter:()=>$('#b-start').click(),c:()=>$('#b-cyc').click(),'ב':()=>$('#b-cyc').click(),k:()=>$('#b-metro').click(),'ל':()=>$('#b-metro').click(),p:()=>$('#b-punch').click(),'פ':()=>$('#b-punch').click(),',':()=>$('#b-rew').click(),'.':()=>$('#b-ff').click(),x:()=>btab('mixer'),'ס':()=>btab('mixer'),e:()=>btab('piano'),'ק':()=>btab('piano'),i:()=>toggleView('insp'),'ן':()=>toggleView('insp'),y:()=>toggleView('lib'),'ט':()=>toggleView('lib'),'?':()=>$('#hp').classList.add('on'),
+  m:()=>{snapshot();T[S.sel].m^=1;renderAll()},'צ':()=>{snapshot();T[S.sel].m^=1;renderAll()},s:()=>{snapshot();T[S.sel].s^=1;renderAll()},'ד':()=>{snapshot();T[S.sel].s^=1;renderAll()},
+  ArrowUp:()=>select(Math.max(0,S.sel-1)),ArrowDown:()=>select(Math.min(T.length-1,S.sel+1)),Delete:()=>{if(S.selRegion){snapshot();T[S.selRegion[0]].regions.splice(S.selRegion[1],1);S.selRegion=null;renderAll();toast('הקטע נמחק · Ctrl+Z לביטול')}}};
+ const f=map[k]||map[k.toLowerCase()];if(f){e.preventDefault();f()}});
+
+function renderAll(){renderTracks();renderInsp();renderBottom()}
+renderRuler();renderAll();renderLib();setState();
+window.addEventListener('resize',()=>{renderRuler();renderTracks()});
+setTimeout(()=>toast('ברוך הבא לאולפן. לחץ R על ערוץ, ואז על כפתור ההקלטה. רווח עוצר.'),600);
+})();
+</script>
+</body>
+</html>
