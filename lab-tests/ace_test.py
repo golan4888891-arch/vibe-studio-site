@@ -34,11 +34,13 @@ tests = [
     ("2-hum-pop-band", GenerationParams(task_type="cover", src_audio="/content/hum.wav", caption="modern pop band arrangement, drums, bass, electric guitar, piano, polished radio production, keep the melody", audio_cover_strength=0.6, instrumental=True, shift=3.0)),
     ("3-hum-mediterranean", GenerationParams(task_type="cover", src_audio="/content/hum.wav", caption="Mediterranean arrangement, oud, darbuka, qanun, strings, warm bass, keep the melody", audio_cover_strength=0.6, instrumental=True, shift=3.0)),
 ]
+ONLY = os.environ.get("ONLY")
 for name, p in tests:
+    if ONLY and not name.startswith(ONLY): continue
     t = time.time()
     try:
         r = generate_music(dit, llm, p, cfg, save_dir="/content/out/" + name)
-        print(name, "ok" if r.success else "FAIL", r.error if not r.success else [a["path"] for a in r.audios], "%.0fs" % (time.time() - t))
+        print(name, "ok" if r.success else "FAIL", r.error if not r.success else [(a["path"], os.path.getsize(a["path"])) for a in r.audios], "%.0fs" % (time.time() - t))
     except Exception:
         traceback.print_exc()
 print("ALL DONE")
