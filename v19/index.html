@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HUM — אולפן</title>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="stylesheet" href="app.css?v=ee68ef8364">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- TOP BAR -->
+  <header class="top card" style="border:0;background:none">
+    <div class="brand">HUM<small>אולפן מוזיקה</small></div>
+    <nav class="menus" id="menus"></nav>
+    <div class="proj">
+      <button class="projname" id="projname" title="הפרויקטים שלי">…</button>
+      <span class="saved"><i></i><span id="savedtxt">נשמר</span></span>
+      <button class="iconbtn" id="undo" title="ביטול פעולה (Ctrl+Z)"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="iconbtn" id="redo" title="ביצוע שוב (Ctrl+Shift+Z)"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+      <button class="iconbtn" id="helpbtn" title="קיצורי מקלדת (?)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5h.01"/></svg></button>
+      <button class="iconbtn" id="setbtn" title="הגדרות שמע: מיקרופון והקשבה עצמית"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg></button>
+    </div>
+  </header>
+
+  <!-- CONTROL BAR -->
+  <section class="ctl card">
+    <div class="transport">
+      <button class="tbtn" id="b-start" title="חזרה להתחלה (Enter)"><svg viewBox="0 0 24 24"><path d="M6 5v14"/><path d="M18 6 9 12l9 6z"/></svg></button>
+      <button class="tbtn" id="b-rew" title="אחורה תיבה (,)"><svg viewBox="0 0 24 24"><path d="M11 6 4 12l7 6z"/><path d="M20 6l-7 6 7 6z"/></svg></button>
+      <button class="tbtn" id="b-ff" title="קדימה תיבה (.)"><svg viewBox="0 0 24 24"><path d="M13 6l7 6-7 6z"/><path d="M4 6l7 6-7 6z"/></svg></button>
+      <button class="tbtn" id="b-stop" title="עצירה (רווח)"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg></button>
+      <button class="tbtn play" id="b-play" title="ניגון / עצירה (רווח)"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="tbtn rec" id="b-rec" title="הקלטה (R) · עצירה ברווח"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5"/></svg></button>
+      <span class="sep"></span>
+      <button class="tbtn cyc" id="b-cyc" title="לולאה (C) · או גרירה על הסרגל"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+      <button class="tbtn" id="b-punch" title="פאנץ' – מקליטים רק את הקטע המסומן על הסרגל"><svg viewBox="0 0 24 24"><path d="M4 12h4"/><path d="M16 12h4"/><rect x="8" y="7" width="8" height="10" rx="2"/></svg></button>
+      <button class="tbtn on" id="b-count" title="ספירה לפני הקלטה (1-2-3-4)"><svg viewBox="0 0 24 24"><path d="M5 20h14"/><path d="M8 20 11 4h2l3 16"/><path d="M12 14l4-6"/></svg></button>
+      <button class="tbtn" id="b-metro" title="מטרונום (K)"><svg viewBox="0 0 24 24"><path d="M9 3h6l3 18H6z"/><path d="M12 15l5-8"/></svg></button>
+      <button class="tbtn" id="b-keys" title="נגינה במקלדת המחשב (Ctrl+K): A–K הם קלידי הפסנתר, Z/X אוקטבה"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 6v7M12 6v7M17 6v7"/></svg></button>
+    </div>
+    <div class="lcd" id="lcd">
+      <div class="pos"><b id="lcd-bars">1.1.1</b><span>תיבה.פעמה</span></div>
+      <div class="pos"><b id="lcd-time">00:00.0</b><span>זמן</span></div>
+      <div><input id="lcd-bpm" value="120" inputmode="numeric" title="קצב – אפשר להקליד"><span>קצב <button id="lcd-tap" class="tap" title="הקשה בקצב: לוחצים 4 פעמים או יותר בקצב הרצוי">טאפ</button></span></div>
+      <div><select id="lcd-sig" title="משקלים נוספים בשלב הבא"><option>4/4</option></select><span>משקל</span></div>
+      <div><select id="lcd-key"></select><span>סולם</span></div>
+      <div class="state"><b id="lcd-state">עצור</b><span>מצב</span></div>
+    </div>
+    <div class="master-mini"><span>הקלטה</span><div class="inmeter" title="עוצמת המיקרופון"><i id="inmeter"></i></div></div>
+    <div class="views">
+      <button class="vbtn on" data-view="insp"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="7" height="16" rx="1.5"/><path d="M14 8h7M14 12h7M14 16h5"/></svg><span class="t">מפקח</span><span class="kbd">I</span></button>
+      <button class="vbtn on" data-view="lib"><svg viewBox="0 0 24 24"><path d="M4 5h4v14H4zM10 5h4v14h-4z"/><path d="m16 6 3.5-1 3 13.5-3.5 1z"/></svg><span class="t">ספרייה</span><span class="kbd">Y</span></button>
+      <button class="vbtn on" data-view="bot"><svg viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v16"/><rect x="4" y="13" width="4" height="3" rx="1"/><rect x="10" y="7" width="4" height="3" rx="1"/><rect x="16" y="11" width="4" height="3" rx="1"/></svg><span class="t">חלון תחתון</span></button>
+    </div>
+  </section>
+
+  <!-- INSPECTOR -->
+  <aside class="insp card" id="insp"></aside>
+
+  <!-- TRACKS / ARRANGE -->
+  <main class="main card">
+    <div class="tools">
+      <div class="toolgrp" id="toolgrp"></div>
+      <div class="snap"><span>הצמדה</span>
+        <select class="sel" id="snap"><option value="4">תיבה</option><option value="1">רבע</option><option value="0.5">שמינית</option><option value="0.25">שש-עשרית</option><option value="0">ללא</option></select>
+      </div>
+      <div class="snap"><span>גובה</span><input type="range" id="th" min="38" max="80" value="52" style="width:70px;accent-color:var(--gold)"></div>
+      <div class="snap"><span>זום</span><input type="range" id="zoom" min="6" max="80" value="18" style="width:90px;accent-color:var(--gold)"></div>
+      <span class="grow"></span>
+      <button class="addtrack" id="addtrack" title="ערוץ חדש (Ctrl+Alt+N)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>ערוץ חדש</button>
+    </div>
+    <div class="arr" id="arr">
+      <div class="corner"><div>סמנים</div><div>אקורדים</div><div></div></div>
+      <div class="rulerwrap" id="rulerwrap">
+        <div class="gtrack" id="g-mark"></div>
+        <div class="gtrack" id="g-chord"></div>
+        <div class="ruler" id="ruler"><div class="cycle" id="cycle"></div><div class="punch" id="punch"></div></div>
+      </div>
+      <div class="heads" id="heads"></div>
+      <div class="lanes" id="lanes"><div class="playhead" id="ph"></div></div>
+      <div class="countin" id="countin">1</div>
+    </div>
+  </main>
+
+  <!-- LIBRARY -->
+  <aside class="lib card" id="lib">
+    <div class="tabs" id="libtabs">
+      <button class="tab on" data-l="inst">כלי נגינה</button>
+      <button class="tab" data-l="files">קבצים</button>
+      <button class="tab" data-l="fx">אפקטים</button>
+      <button class="tab" data-l="ai" title="יגיע אחרי שהבסיס יושלם">עוזר · בהמשך</button>
+    </div>
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="libq" placeholder="חיפוש כלי, צליל או אפקט…"></div>
+    <div class="chips" id="chips"></div>
+    <div class="items" id="items"></div>
+  </aside>
+
+  <!-- BOTTOM PANEL -->
+  <section class="bot card">
+    <div class="btabs" id="btabs">
+      <button class="btab on" data-b="mixer">מיקסר <span class="kbd">X</span></button>
+      <button class="btab" data-b="piano">עורך תווים <span class="kbd">E</span></button>
+      <button class="btab" data-b="audio">עורך שמע</button>
+      <button class="btab" data-b="steps">מכונת תופים</button>
+      <button class="btab" data-b="fx">אפקטים לערוץ</button>
+      <button class="btab" data-b="keys">מקלדת</button>
+      <button class="btab" data-b="master">מאסטר וייצוא</button>
+      <span class="ctx" id="bctx"></span>
+    </div>
+    <div class="bpane mixer on" id="p-mixer"></div>
+    <div class="bpane" id="p-piano"></div>
+    <div class="bpane" id="p-audio"></div>
+    <div class="bpane" id="p-steps"></div>
+    <div class="bpane" id="p-fx"></div>
+    <div class="bpane" id="p-keys"></div>
+    <div class="bpane" id="p-master"></div>
+  </section>
+</div>
+
+<!-- NEW TRACK DIALOG -->
+<div class="scrim" id="nt">
+  <div class="dlg" role="dialog" aria-label="ערוץ חדש">
+    <header><h3>ערוץ חדש</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+    <div class="body">
+      <div class="types" id="types"></div>
+      <div class="fields">
+        <div class="field"><label>מקור הצליל (כניסה)</label><select id="nt-in"><option>מיקרופון 1 (מונו)</option><option>מיקרופון 2 (מונו)</option><option>כניסה 1+2 (סטריאו)</option></select></div>
+        <div class="field"><label>כלי / צליל</label><select id="nt-inst"></select></div>
+        <div class="field"><label>כמה ערוצים</label><input type="number" id="nt-n" value="1" min="1" max="16"></div>
+        <div class="field"><label>שם</label><input id="nt-name" placeholder="למשל: שירה ראשית"></div>
+        <div class="field"><label>צבע</label><select id="nt-color"><option value="var(--t1)">ורוד</option><option value="var(--t2)">ירוק</option><option value="var(--t3)">סגול</option><option value="var(--t4)">כחול</option><option value="var(--t5)">זהב</option><option value="var(--t6)">טורקיז</option></select></div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="nt-arm" checked> מוכן להקלטה (R)</label>
+        <label><input type="checkbox" id="nt-mon"> לשמוע את עצמי בזמן הקלטה (רק עם אוזניות)</label>
+        <label><input type="checkbox" id="nt-lib" checked> לפתוח את ספריית הצלילים</label>
+      </div>
+    </div>
+    <footer><button class="btn gold" id="nt-ok">יצירה</button><button class="btn" data-close>ביטול</button></footer>
+  </div>
+</div>
+
+<!-- PLUGIN WINDOW -->
+<div class="scrim" id="pw">
+  <div class="dlg plug" role="dialog">
+    <header><h3 id="pw-title">אקולייזר</h3>
+      <div style="display:flex;gap:6px;align-items:center"><select class="sel" id="pw-preset"></select><button class="btn" id="pw-bypass">עקיפה</button><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></header>
+    <div class="body" id="pw-body"></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div class="scrim" id="hp">
+  <div class="dlg"><header><h3>קיצורי מקלדת – כמו בכל תוכנת הקלטה</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+  <div class="body"><div class="helpgrid" id="helpgrid"></div></div></div>
+</div>
+
+<!-- PROJECTS -->
+<div class="scrim" id="pj">
+  <div class="dlg"><header><h3>הפרויקטים שלי</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+  <div class="body"><div class="items" id="pj-list" style="max-height:52vh"></div></div>
+  <footer><button class="btn gold" id="pj-new">פרויקט חדש</button><button class="btn" data-close>סגירה</button></footer></div>
+</div>
+<!-- ASK (name / confirm) -->
+<div class="scrim" id="ask">
+  <div class="dlg" style="width:min(460px,94vw)"><header><h3 id="ask-t"></h3></header>
+  <div class="body"><div id="ask-m" style="line-height:1.6"></div><input id="ask-in" class="field" style="background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 10px"></div>
+  <footer><button class="btn gold" id="ask-ok">אישור</button><button class="btn" id="ask-no">ביטול</button></footer></div>
+</div>
+<!-- AUDIO SETTINGS -->
+<div class="scrim" id="st">
+  <div class="dlg" style="width:min(520px,94vw)"><header><h3>הגדרות שמע</h3><button class="iconbtn" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>
+  <div class="body"><div class="field"><label>מיקרופון</label><select id="st-in"></select></div>
+  <div class="checks"><label><input type="checkbox" id="st-mon"> לשמוע את עצמי בזמן הקלטה (רק עם אוזניות, אחרת יש צפצוף)</label></div>
+  <div class="row"><button class="btn" id="st-midi">חיבור מקלדת MIDI</button><span class="lbl" id="st-midi-s">מקלדת שמחוברת למחשב בכבל USB</span></div>
+  <div class="lbl">הגדרות רמקולים והשהיה יגיעו בגרסת המחשב.</div></div></div>
+</div>
+<input type="file" id="f-audio" accept="audio/*" hidden>
+<input type="file" id="f-midi" accept=".mid,.midi" hidden>
+<div class="toast" id="toast"></div>
+
+
+<script>window.__HUM_SAMPLE_INDEX__ = "instruments/index.json?v=62ced93ab1";</script>
+<script src="app.js?v=ee68ef8364"></script>
+</body>
+</html>
